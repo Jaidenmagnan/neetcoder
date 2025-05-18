@@ -1,5 +1,7 @@
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const Sequelize = require('sequelize');
+
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
@@ -10,13 +12,9 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // When the client is ready, run this code (only once).
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
 // It makes some properties non-nullable.
-client.once(Events.ClientReady, readyClient => {
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
 
-// Log in to Discord with your client's token
-client.login(token);
 
+// ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
 // these are going to be our commands
 client.commands = new Collection();
 
@@ -59,3 +57,38 @@ client.on(Events.InteractionCreate, async interaction => {
         }
     }
 });
+// ************************** END COMMANDS 
+
+// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
+const sequelize = new Sequelize('database', 'user', 'password', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    logging: false,
+    // SQLite only
+    storage: 'database.sqlite',
+});
+
+const Tags = sequelize.define('tags', {
+    name: {
+        type: Sequelize.STRING,
+        unique: true,
+    },
+    description: Sequelize.TEXT,
+    username: Sequelize.STRING,
+    usage_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+});
+
+// ************************** END DATABASE
+
+
+client.once(Events.ClientReady, readyClient => {
+    Tags.sync({ force: true })
+    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
+
+// Log in to Discord with your client's token
+client.login(token);
