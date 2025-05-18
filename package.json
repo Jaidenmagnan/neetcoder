@@ -1,0 +1,16 @@
+{
+  "name": "neetcoder",
+  "module": "index.js",
+  "type": "commonjs",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "eslint": "^9.27.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3"
+  }
+}
