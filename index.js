@@ -22,6 +22,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
     storage: 'database.sqlite',
 });
 
+// this is how we make a database table
 const Tags = sequelize.define('tags', {
     name: {
         type: Sequelize.STRING,
