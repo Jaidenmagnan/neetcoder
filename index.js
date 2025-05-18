@@ -19,7 +19,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
     dialect: 'sqlite',
     logging: false,
     // SQLite only
-    storage: 'database.sqlite',
+    storage: 'db/database.sqlite',
 });
 
 // this is how we make a database table
