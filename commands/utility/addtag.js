@@ -3,8 +3,17 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('addtag')
-        .setDescription('adds a tag to the database'),
-    async execute(interaction) {
+        .setDescription('adds a tag to the database')
+
+        .addStringOption(option =>
+            option.setName('name')
+                .setDescription('the name of the tag'))
+
+        .addStringOption(option =>
+            option.setName('description')
+                .setDescription('the description of the tag')),
+
+    async execute(interaction, Tags) {
         const tagName = interaction.options.getString('name');
         const tagDescription = interaction.options.getString('description');
 

@@ -13,6 +13,30 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
 // It makes some properties non-nullable.
 
+// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
+const sequelize = new Sequelize('database', 'user', 'password', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    logging: false,
+    // SQLite only
+    storage: 'database.sqlite',
+});
+
+const Tags = sequelize.define('tags', {
+    name: {
+        type: Sequelize.STRING,
+        unique: true,
+    },
+    description: Sequelize.TEXT,
+    username: Sequelize.STRING,
+    usage_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+});
+
+// ************************** END DATABASE
 
 // ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
 // these are going to be our commands
@@ -47,7 +71,7 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 
     try {
-        await command.execute(interaction);
+        await command.execute(interaction, Tags);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
@@ -59,30 +83,7 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 // ************************** END COMMANDS 
 
-// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
-const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    logging: false,
-    // SQLite only
-    storage: 'database.sqlite',
-});
 
-const Tags = sequelize.define('tags', {
-    name: {
-        type: Sequelize.STRING,
-        unique: true,
-    },
-    description: Sequelize.TEXT,
-    username: Sequelize.STRING,
-    usage_count: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-    },
-});
-
-// ************************** END DATABASE
 
 
 client.once(Events.ClientReady, readyClient => {
