@@ -19,6 +19,11 @@ const Users = sequelize.define('users', {
         defaultValue: 0,
         allowNull: false,
     },
+    level: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
+        allowNull: false,
+    },
 });
 
 module.exports = { Users, Sequelize };

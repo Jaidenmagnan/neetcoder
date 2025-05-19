@@ -53,6 +53,26 @@ module.exports = {
     },
 };
 
+function step(level, message_count) {
+    points = [
+        [1, 5],
+        [2, 25],
+        [3, 50],
+        [4, 50],
+    ]
+    if (level <= 4) {
+        for (let i = 0; i < points.length - 1; i++) {
+            if (message_count >= (points[i][1])) {
+                level = points[i][0];
+            }
+        }
+    }
+    else {
+        level = 4 + (((message_count) - 130) % 100);
+    }
+    return level;
+
+}
 async function logXp(message) {
     let user = await Users.findOne({ where: { userid: message.author.id } });
 
@@ -60,6 +80,7 @@ async function logXp(message) {
         user = await Users.create({
             userid: message.author.id,
             message_count: 0,
+            level: 1,
         });
     }
 
