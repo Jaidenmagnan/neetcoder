@@ -35,18 +35,6 @@ function loadCommands() {
 }
 
 // message listener for reloading
-client.on(Events.MessageCreate, async message => {
-    if(message.content == "<@1373490238277550202> reload") {
-        // check message author
-        if(message.author == "314903883874828288" || message.author == "530872774986694656") {
-            console.log("reloading commands");
-            if(message.author == "314903883874828288") {
-                message.reply("Jaiden ur fucking weird");
-            }
-            else {
-                message.reply("wsg gang")
-            }
-            loadCommands();
 
 function loadEvents() {
     const eventsPath = path.join(__dirname, 'events');
