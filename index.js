@@ -3,7 +3,7 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
-const { generateMadLibs } = require('./commands/fun/madlibs');
+
 
 const client = new Client({
     intents: [
@@ -23,6 +23,7 @@ function loadCommands() {
         const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
             const filePath = path.join(commandsPath, file);
+            delete require.cache[require.resolve(filePath)];
             const command = require(filePath);
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ('data' in command && 'execute' in command) {
@@ -40,6 +41,7 @@ function loadEvents() {
 
     for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
+        delete require.cache[require.resolve(filePath)];
         const event = require(filePath);
         if (event.once) {
             client.once(event.name, (...args) => event.execute(...args));
@@ -50,41 +52,9 @@ function loadEvents() {
     }
 }
 
-client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
-
-    if (message.mentions.everyone) {
-        try {
-            const madLibsStory = generateMadLibs(message.author.username, message.author.id);
-            if (madLibsStory && madLibsStory.trim() !== '') {
-                await message.channel.send(madLibsStory);
-            } else {
-                console.error('Empty story generated');
-                await message.channel.send("Oops! The story generator had a brain fart. Please try again!");
-            }
-        } catch (error) {
-            console.error('Error in message handler:', error);
-            await message.channel.send("Oops! Something went wrong. Please try again!");
-        }
-    }
-
-    if(message.content == "<@1373490238277550202> reload") {
-        // check message author
-        if(message.author == "314903883874828288" || message.author == "530872774986694656") {
-            console.log("reloading commands");
-            if(message.author == "314903883874828288") {
-                message.reply("Jaiden ur fucking weird");
-            }
-            else {
-                message.reply("wsg gang")
-            }
-            loadCommands();
-        }
-    }
-});
-
 loadCommands();
 loadEvents();
+module.exports = { loadCommands, loadEvents };
 
 // Log in to Discord with your client's token
 client.login(token);
