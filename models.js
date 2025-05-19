@@ -10,7 +10,10 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 
 // this is how we make a database table
 const Users = sequelize.define('users', {
-    username: Sequelize.STRING,
+    userid: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
     message_count: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
