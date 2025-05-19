@@ -7,10 +7,12 @@ const path = require('node:path');
 const { token } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages
-] });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages
+    ]
+});
 
 // When the client is ready, run this code (only once).
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
@@ -26,14 +28,9 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 });
 
 // this is how we make a database table
-const Tags = sequelize.define('tags', {
-    name: {
-        type: Sequelize.STRING,
-        unique: true,
-    },
-    description: Sequelize.TEXT,
+const Users = sequelize.define('users', {
     username: Sequelize.STRING,
-    usage_count: {
+    message_count: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false,
@@ -71,11 +68,11 @@ function loadCommands() {
 client.on(Events.MessageCreate, async message => {
     console.log("message received");
 
-    if(message.content == "<@1373490238277550202> reload") {
+    if (message.content == "<@1373490238277550202> reload") {
         // check message author
-        if(message.author == "314903883874828288" || message.author == "530872774986694656") {
+        if (message.author == "314903883874828288" || message.author == "530872774986694656") {
             console.log("reloading commands");
-            if(message.author == "314903883874828288") {
+            if (message.author == "314903883874828288") {
                 message.reply("Jaiden ur fucking weird");
             }
             else {
@@ -101,7 +98,7 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 
     try {
-        await command.execute(interaction, Tags);
+        await command.execute(interaction, Users);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
@@ -117,7 +114,7 @@ client.on(Events.InteractionCreate, async interaction => {
 loadCommands();
 
 client.once(Events.ClientReady, readyClient => {
-    Tags.sync({ force: true })
+    Users.sync({ force: true });
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
