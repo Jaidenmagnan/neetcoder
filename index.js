@@ -1,7 +1,5 @@
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const Sequelize = require('sequelize');
-
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
@@ -10,37 +8,9 @@ const { token } = require('./config.json');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages
-    ]
+        GatewayIntentBits.GuildMessages,
+    ],
 });
-
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-
-// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
-const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    logging: false,
-    // SQLite only
-    storage: 'db/database.sqlite',
-});
-
-// this is how we make a database table
-const Users = sequelize.define('users', {
-    username: Sequelize.STRING,
-    message_count: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-    },
-});
-
-// ************************** END DATABASE
-
-// ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
-// these are going to be our commands
 
 function loadCommands() {
     client.commands = new Collection();
@@ -64,59 +34,25 @@ function loadCommands() {
     }
 }
 
-// message listener for reloading
-client.on(Events.MessageCreate, async message => {
-    console.log("message received");
+function loadEvents() {
+    const eventsPath = path.join(__dirname, 'events');
+    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-    if (message.content == "<@1373490238277550202> reload") {
-        // check message author
-        if (message.author == "314903883874828288" || message.author == "530872774986694656") {
-            console.log("reloading commands");
-            if (message.author == "314903883874828288") {
-                message.reply("Jaiden ur fucking weird");
-            }
-            else {
-                message.reply("wsg gang")
-            }
-            loadCommands();
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
         }
         else {
-            console.log("incorrect user");
-            message.reply("You can't run this command");
+            client.on(event.name, (...args) => event.execute(...args));
         }
     }
-})
+}
 
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-
-    try {
-        await command.execute(interaction, Users);
-    } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-        } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-        }
-    }
-});
-// ************************** END COMMANDS 
-
-// initial loading of commands
 loadCommands();
-
-client.once(Events.ClientReady, readyClient => {
-    Users.sync({ force: true });
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+loadEvents();
 
 // Log in to Discord with your client's token
 client.login(token);
