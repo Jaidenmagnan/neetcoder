@@ -16,7 +16,7 @@ module.exports = {
 
         if (message.content == "<@1373490238277550202> reload") {
             // check message author
-            if (message.author == "314903883874828288" || interaction.message.author == "530872774986694656") {
+            if (message.author == "314903883874828288" || message.author == "530872774986694656") {
                 console.log("reloading commands");
                 if (message.author == "314903883874828288") {
                     message.reply("omar is cringe");
