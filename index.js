@@ -5,6 +5,7 @@ const Sequelize = require('sequelize');
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
+const { generateMadLibs } = require('./commands/fun/madlibs');
 
 // Create a new client instance
 const client = new Client({ intents: [
@@ -70,6 +71,23 @@ function loadCommands() {
 // message listener for reloading
 client.on(Events.MessageCreate, async message => {
     console.log("message received");
+
+    if (message.author.bot) return;
+
+    if (message.mentions.everyone) {
+        try {
+            const madLibsStory = generateMadLibs(message.author.username, message.author.id);
+            if (madLibsStory && madLibsStory.trim() !== '') {
+                await message.channel.send(madLibsStory);
+            } else {
+                console.error('Empty story generated');
+                await message.channel.send("Oops! The story generator had a brain fart. Please try again!");
+            }
+        } catch (error) {
+            console.error('Error in message handler:', error);
+            await message.channel.send("Oops! Something went wrong. Please try again!");
+        }
+    }
 
     if(message.content == "<@1373490238277550202> reload") {
         // check message author
