@@ -1,7 +1,5 @@
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const Sequelize = require('sequelize');
-
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
@@ -17,27 +15,6 @@ const client = new Client({
 // When the client is ready, run this code (only once).
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
 // It makes some properties non-nullable.
-
-// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
-const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    logging: false,
-    // SQLite only
-    storage: 'db/database.sqlite',
-});
-
-// this is how we make a database table
-const Users = sequelize.define('users', {
-    username: Sequelize.STRING,
-    message_count: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-    },
-});
-
-// ************************** END DATABASE
 
 // ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
 // these are going to be our commands
@@ -85,38 +62,30 @@ client.on(Events.MessageCreate, async message => {
             message.reply("You can't run this command");
         }
     }
-})
+});
 
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
+// ************************** END COMMANDS
 
-    const command = interaction.client.commands.get(interaction.commandName);
+// ************************** LOAD EVENTS
+function loadEvents() {
+    const eventsPath = path.join(__dirname, 'events');
+    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-
-    try {
-        await command.execute(interaction, Users);
-    } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-        } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+        }
+        else {
+            client.on(event.name, (...args) => event.execute(...args));
         }
     }
-});
-// ************************** END COMMANDS 
+}
 
-// initial loading of commands
+// **************************** END EVENTS
 loadCommands();
-
-client.once(Events.ClientReady, readyClient => {
-    Users.sync({ force: true });
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+loadEvents();
 
 // Log in to Discord with your client's token
 client.login(token);
