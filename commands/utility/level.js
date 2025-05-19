@@ -6,7 +6,17 @@ module.exports = {
         .setName('level')
         .setDescription('check the level of your user'),
     async execute(interaction) {
+        let user = await Users.findOne({ where: { userid: interaction.user.id } });
 
-        await interaction.reply('Pong!');
+        if (!user) {
+            user = await Users.create({
+                userid: interaction.user.id,
+                message_count: 0,
+                level: 1,
+            });
+        }
+
+        await interaction.reply(`You are level, ${user.level}`);
+
     },
 };
