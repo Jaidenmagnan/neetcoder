@@ -1,0 +1,43 @@
+{
+    "attack" : {
+        "light": [
+            "ATK lightly slapped DEF",
+            "ATK called DEF a dumbass",
+            "ATK took DEF's lunch money",
+            "ATK muted DEF in neetcoders",
+            "ATK afked while DEF was trying to farm",
+            "ATK changed DEF's nickname to \"Stupid\"",
+            "ATK flicked DEF's forehead",
+            "ATK gave DEF gas station sushi",
+            "ATK made DEF geek out",
+            "ATK gave DEF some McDonalds Crab Legs"
+        ],
+        "medium" : [
+            "ATK hit DEF with a nasty left hook",
+            "ATK kicked DEF really really hard",
+            "ATK took away DEF's bright futures",
+            "ATK exposed DEF's digital footprint to recruiters",
+            "ATK kicked DEF from neetcoders",
+            "ATK made DEF fail baby circuits",
+            "ATK pushed DEF off Tony's skybase"
+        ],
+        "heavy" : [
+            "ATK hit DEF with a nail bat",
+            "ATK hit DEF with a Sharp 5 netherite sword",
+            "ATK made DEF listen to Shaboozey",
+            "ATK left DEF on read",
+            "ATK made DEF take another Schwartz class"
+        ],
+        "doomed" : [
+            "ATK banned DEF from neetcoders",
+            "ATK talked bad about DEF to Fuchs",
+            "ATK said DEF was really really lame",
+            "ATK won against DEF in the minecraft war"
+        ]
+    },
+    "heal" : [
+        "HEAL drank some water",
+        "HEAL ate a cookie",
+        "HEAL put a bandage on"
+    ]
+}
