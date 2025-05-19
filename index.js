@@ -12,13 +12,6 @@ const client = new Client({
     ]
 });
 
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-
-// ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
-// these are going to be our commands
-
 function loadCommands() {
     client.commands = new Collection();
 
@@ -37,6 +30,22 @@ function loadCommands() {
             } else {
                 console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
             }
+        }
+    }
+}
+
+function loadEvents() {
+    const eventsPath = path.join(__dirname, 'events');
+    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+        }
+        else {
+            client.on(event.name, (...args) => event.execute(...args));
         }
     }
 }
@@ -64,26 +73,6 @@ client.on(Events.MessageCreate, async message => {
     }
 });
 
-// ************************** END COMMANDS
-
-// ************************** LOAD EVENTS
-function loadEvents() {
-    const eventsPath = path.join(__dirname, 'events');
-    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-    for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, file);
-        const event = require(filePath);
-        if (event.once) {
-            client.once(event.name, (...args) => event.execute(...args));
-        }
-        else {
-            client.on(event.name, (...args) => event.execute(...args));
-        }
-    }
-}
-
-// **************************** END EVENTS
 loadCommands();
 loadEvents();
 
