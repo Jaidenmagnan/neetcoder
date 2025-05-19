@@ -59,6 +59,7 @@ function loadCommands() {
             const command = require(filePath);
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ('data' in command && 'execute' in command) {
+                delete require.cache[require.resolve(filePath)];
                 client.commands.set(command.data.name, command);
             } else {
                 console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
@@ -69,8 +70,6 @@ function loadCommands() {
 
 // message listener for reloading
 client.on(Events.MessageCreate, async message => {
-    console.log("message received");
-
     if(message.content == "<@1373490238277550202> reload") {
         // check message author
         if(message.author == "314903883874828288" || message.author == "530872774986694656") {
