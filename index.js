@@ -1,49 +1,15 @@
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const Sequelize = require('sequelize');
-
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 const { token } = require('./config.json');
 
-// Create a new client instance
-const client = new Client({ intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages
-] });
-
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-
-// ************************** THIS SECTION IS FOR OUR DATABASE*****************************************//
-const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    logging: false,
-    // SQLite only
-    storage: 'db/database.sqlite',
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+    ],
 });
-
-// this is how we make a database table
-const Tags = sequelize.define('tags', {
-    name: {
-        type: Sequelize.STRING,
-        unique: true,
-    },
-    description: Sequelize.TEXT,
-    username: Sequelize.STRING,
-    usage_count: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-    },
-});
-
-// ************************** END DATABASE
-
-// ************************** THIS SECTION IS FOR OUR COMMANDS *****************************************//
-// these are going to be our commands
 
 function loadCommands() {
     client.commands = new Collection();
@@ -81,44 +47,26 @@ client.on(Events.MessageCreate, async message => {
                 message.reply("wsg gang")
             }
             loadCommands();
+
+function loadEvents() {
+    const eventsPath = path.join(__dirname, 'events');
+    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
         }
         else {
-            console.log("incorrect user");
-            message.reply("You can't run this command");
+            client.on(event.name, (...args) => event.execute(...args));
         }
     }
-})
+}
 
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-
-    try {
-        await command.execute(interaction, Tags);
-    } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-        } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-        }
-    }
-});
-// ************************** END COMMANDS 
-
-// initial loading of commands
 loadCommands();
-
-client.once(Events.ClientReady, readyClient => {
-    Tags.sync({ force: true })
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+loadEvents();
 
 // Log in to Discord with your client's token
 client.login(token);
