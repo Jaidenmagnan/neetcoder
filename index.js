@@ -57,6 +57,7 @@ function loadEvents() {
 
 loadCommands();
 loadEvents();
+
 module.exports = { loadCommands, loadEvents };
 
 // Log in to Discord with your client's token
