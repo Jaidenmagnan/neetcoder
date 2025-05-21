@@ -74,9 +74,10 @@ module.exports = {
         async function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
-        
-        await interaction.reply("starting battle");
 
+        let s = "starting battle\n";
+        const ref = await interaction.reply(s);
+        
         const f1 = await interaction.options.getUser("userone").displayName;
         const f2 = await interaction.options.getUser("usertwo").displayName;
 
@@ -86,13 +87,14 @@ module.exports = {
 
 
         while(hp1 > 0 && hp2 > 0) {
-            await interaction.channel.send(`# Round ${count}!`);
+            s += `# Round ${count}!\n`;
+            await ref.edit(s);
             await sleep(1000);
 
             // user 1 turn
             [dmg, atk] = getAttack();
-            atk = atk.replace("ATK", f1).replace("DEF", f2) + ` for **${dmg}** damage!`;
-            await interaction.channel.send(atk);
+            s += atk.replace("ATK", f1).replace("DEF", f2) + ` for **${dmg}** damage!\n`;
+            await ref.edit(s);
             await sleep(1000);
 
             hp2 -= dmg;
@@ -102,16 +104,16 @@ module.exports = {
             let h = randInt(0, 20);
             if(0 <= h && h <= 2) {
                 [heal, msg] = getHeal();
-                msg = msg.replace("HEAL", f2) + ` for **${heal}** HP!`;
+                s += msg.replace("HEAL", f2) + ` for **${heal}** HP!\n`;
                 hp2 += heal;
-                await interaction.channel.send(msg);
+                await ref.edit(s);
                 await sleep(1000);
             }
 
             // user 2 attack
             [dmg, atk] = getAttack();
-            atk = atk.replace("ATK", f2).replace("DEF", f1) + ` for **${dmg}** damage!`;
-            await interaction.channel.send(atk);
+            s += atk.replace("ATK", f2).replace("DEF", f1) + ` for **${dmg}** damage!\n`;
+            await ref.edit(s);
             await sleep(1000);
 
             hp1 -= dmg;
@@ -121,17 +123,19 @@ module.exports = {
             h = randInt(0, 20);
             if(0 <= h && h <= 2) {
                 [heal, msg] = getHeal();
-                msg = msg.replace("HEAL", f1) + ` for **${heal}** HP!`;
+                s += msg.replace("HEAL", f1) + ` for **${heal}** HP!\n`;
                 hp1 += heal;
-                await interaction.channel.send(msg);
+                await ref.edit(s);
                 await sleep(1000);
             }
 
             count += 1;
 
-            await interaction.channel.send(`${f1} has **${hp1}** HP left!`);
+            s += `${f1} has **${hp1}** HP left!\n`;
+            await ref.edit(s);
             await sleep(1000);
-            await interaction.channel.send(`${f2} has **${hp2}** HP left!`);
+            s += `${f2} has **${hp2}** HP left!\n`;
+            await ref.edit(s);
             await sleep(1000);
         }
 
