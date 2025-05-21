@@ -5,13 +5,15 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('init_welcome')
         .setDescription('initializes the welcome log')
-        .addStringOption(option =>
+        .addChannelOption(option =>
             option.setName('channel')
-                .setDescription('the designated channel to report welcome logs to.')),
+                .setDescription('the designated channel to report welcome logs to.')
+                .setRequired(true),
+            ),
 
     async execute(interaction) {
         let config_line = await Configurations.findOne({ where: { field: 'welcome_channel' } });
-        const designated_channel = interaction.options.getString('channel');
+        const designated_channel = interaction.options.getChannel('channel');
 
         if (!config_line) {
             config_line = await Configurations.create({
@@ -19,8 +21,8 @@ module.exports = {
             });
         }
 
-        await Configurations.update({ channel: designated_channel }, { where: { field: 'welcome_channel' } });
-        console.log(`All welcome messages will be redirected to ${designated_channel}`)
+        await Configurations.update({ channel: designated_channel.id }, { where: { field: 'welcome_channel' } });
+        console.log(`All welcome messages will be redirected to ${designated_channel.name}`)
         interaction.reply({
             content: `All welcome messages will be redirected to ${designated_channel}`,
             flags: MessageFlags.Ephemeral,
