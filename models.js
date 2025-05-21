@@ -26,4 +26,17 @@ const Users = sequelize.define('users', {
     },
 });
 
-module.exports = { Users, Sequelize };
+const Configurations = sequelize.define('configurations', {
+    field: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '',
+    },
+    channel: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: '',
+    },
+});
+
+module.exports = { Users, Sequelize, Configurations };
