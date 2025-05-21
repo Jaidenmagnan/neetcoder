@@ -1,5 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
 const text = require("./deathbattle.json");
+const Canvas = require('@napi-rs/canvas');
+const { request } = require('undici');
 
 function randInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -40,6 +42,21 @@ function getAttack() {
     return [0, "there was a bug :/"];
 }
 
+async function addCrown(avaURL) {
+    const canvas = Canvas.createCanvas(128, 128);
+    const context = canvas.getContext('2d');
+
+    const { body } = await request(avaURL);
+    const avatar = await Canvas.loadImage(await body.arrayBuffer());   
+    const crown = await Canvas.loadImage('./assets/crown.png');
+    
+    context.drawImage(avatar, 0, 0, canvas.width, canvas.height);
+    context.drawImage(crown, 14, 5);
+
+    const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'winner.png' });
+    return attachment;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('deathbattle')
@@ -60,8 +77,8 @@ module.exports = {
         
         await interaction.reply("starting battle");
 
-        const f1 = interaction.options.getUser("userone").displayName;
-        const f2 = interaction.options.getUser("usertwo").displayName;
+        const f1 = await interaction.options.getUser("userone").displayName;
+        const f2 = await interaction.options.getUser("usertwo").displayName;
 
         let hp1 = 100;
         let hp2 = 100;
@@ -118,18 +135,18 @@ module.exports = {
             await sleep(1000);
         }
 
-        if(hp2 <= 0) {
-            let id1 = interaction.options.getUser("userone").id;
-            let ava = await interaction.options.getUser("userone").avatarURL();
-            await interaction.channel.send(`<@${id1}> wins with **${hp1}** HP left!`);
-            await interaction.channel.send("https://www.citypng.com/public/uploads/preview/hd-realistic-gold-king-crown-png-704081695122733mzs7cerwxf.png");
-            await interaction.channel.send(`${ava}`);
-        } else {
-            let id2 = interaction.options.getUser("usertwo").id;
-            let ava = await interaction.options.getUser("usertwo").avatarURL();
-            await interaction.channel.send(`<@${id2}> wins with **${hp2}** HP left!`);
-            await interaction.channel.send("https://www.citypng.com/public/uploads/preview/hd-realistic-gold-king-crown-png-704081695122733mzs7cerwxf.png");
-            await interaction.channel.send(`${ava}`);
+        let id = await interaction.options.getUser("userone").id;
+        let ava = await interaction.options.getUser("userone").displayAvatarURL({ extension: 'jpg' });
+        let hp = hp1;
+
+        if(hp1 <= 0) {
+            id = await interaction.options.getUser("usertwo").id;
+            ava = await interaction.options.getUser("usertwo").displayAvatarURL({ extension: 'jpg' });
+            hp = hp2;
         }
+
+        await interaction.channel.send(`<@${id}> wins with **${hp}** HP left!`);
+        let cAva = await addCrown(ava);
+        await interaction.channel.send({ files: [cAva] });
     }
 }
