@@ -1,3 +1,4 @@
+const { sleep } = require('bun');
 const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
 const text = require("./deathbattle.json");
 const Canvas = require('@napi-rs/canvas');
@@ -48,13 +49,65 @@ async function addCrown(avaURL) {
 
     const { body } = await request(avaURL);
     const avatar = await Canvas.loadImage(await body.arrayBuffer());   
+    // crown = 100 by 58
     const crown = await Canvas.loadImage('./assets/crown.png');
     
     context.drawImage(avatar, 0, 0, canvas.width, canvas.height);
-    context.drawImage(crown, 14, 5);
+    context.drawImage(crown, 30, 5, 69, 40);
 
     const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'winner.png' });
     return attachment;
+}
+
+function attack(attacker, defender, hp) {
+    // user 1 turn
+    let nhp = hp;
+    let edits = [];
+    [dmg, atk] = getAttack();
+    s = atk.replace("ATK", attacker).replace("DEF", defender) + ` for **${dmg}** damage!\n`;
+    edits.push(s);
+
+    nhp -= dmg;
+    if(nhp <= 0) return [edits, 0];
+    
+    // user 2 heal
+    let h = randInt(0, 20);
+    if(0 <= h && h <= 2) {
+        [heal, msg] = getHeal();
+        msg = msg.replace("HEAL", defender) + ` for **${heal}** hp!\n`
+        nhp += heal;
+        edits.push(msg);
+    }
+    
+    return [edits, nhp];
+}
+
+function turn(hp1, hp2, f1, f2) {
+    let first = Math.random();
+    let nhp1 = hp1;
+    let nhp2 = hp2;
+    // player 1 goes first
+    if(first < 0.5) {
+        [edits, nhp2] = attack(f1, f2, hp2);
+        if(nhp2 <= 0) {
+            return [edits, nhp1, nhp2];
+        }
+        
+        [edits2, nhp1] = attack(f2, f1, hp1);
+        edits = edits.concat(edits2);
+        return [edits, nhp1, nhp2];
+    }
+    // player 2 goes first
+    else {
+        [edits, nhp1] = attack(f2, f1, hp1);
+        if(nhp1 <= 0) {
+            return [edits, nhp1, nhp2];
+        }
+        
+        [edits2, nhp2] = attack(f1, f2, hp2);
+        edits = edits.concat(edits2);
+        return [edits, nhp1, nhp2];
+    }
 }
 
 module.exports = {
@@ -70,11 +123,6 @@ module.exports = {
             .setRequired(true)
             .setDescription("second fighter")),
     async execute(interaction) {
-
-        async function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
         let s = "starting battle\n";
         const ref = await interaction.reply(s);
         
@@ -85,58 +133,30 @@ module.exports = {
         let hp2 = 100;
         let count = 1;
 
-
         while(hp1 > 0 && hp2 > 0) {
             s += `# Round ${count}!\n`;
             await ref.edit(s);
             await sleep(1000);
 
-            // user 1 turn
-            [dmg, atk] = getAttack();
-            s += atk.replace("ATK", f1).replace("DEF", f2) + ` for **${dmg}** damage!\n`;
-            await ref.edit(s);
-            await sleep(1000);
+            [edits, hp1, hp2] = turn(hp1, hp2, f1, f2);
 
-            hp2 -= dmg;
-            if (hp2 <= 0) break;
-
-            // user 2 heal
-            let h = randInt(0, 20);
-            if(0 <= h && h <= 2) {
-                [heal, msg] = getHeal();
-                s += msg.replace("HEAL", f2) + ` for **${heal}** HP!\n`;
-                hp2 += heal;
+            for(let i = 0; i < edits.length; i++) {
+                s += edits[i];
                 await ref.edit(s);
                 await sleep(1000);
             }
 
-            // user 2 attack
-            [dmg, atk] = getAttack();
-            s += atk.replace("ATK", f2).replace("DEF", f1) + ` for **${dmg}** damage!\n`;
-            await ref.edit(s);
-            await sleep(1000);
-
-            hp1 -= dmg;
-            if(hp1 <= 0) break;
-
-            // user 1 heal
-            h = randInt(0, 20);
-            if(0 <= h && h <= 2) {
-                [heal, msg] = getHeal();
-                s += msg.replace("HEAL", f1) + ` for **${heal}** HP!\n`;
-                hp1 += heal;
-                await ref.edit(s);
-                await sleep(1000);
-            }
-
-            count += 1;
+            if(hp1 == 0 || hp2 == 0) break;
 
             s += `${f1} has **${hp1}** HP left!\n`;
             await ref.edit(s);
             await sleep(1000);
+
             s += `${f2} has **${hp2}** HP left!\n`;
             await ref.edit(s);
             await sleep(1000);
+
+            count++;
         }
 
         let id = await interaction.options.getUser("userone").id;

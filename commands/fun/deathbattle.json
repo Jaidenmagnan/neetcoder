@@ -1,5 +1,5 @@
 {
-    "attack" : {
+    "attack": {
         "light": [
             "ATK lightly slapped DEF",
             "ATK called DEF a dumbass",
@@ -10,34 +10,92 @@
             "ATK flicked DEF's forehead",
             "ATK gave DEF gas station sushi",
             "ATK made DEF geek out",
-            "ATK gave DEF some McDonalds Crab Legs"
+            "ATK gave DEF some McDonalds Crab Legs",
+            "ATK sent DEF a rickroll",
+            "ATK stole DEF’s last slice of pizza",
+            "ATK used DEF’s mug and didn’t wash it",
+            "ATK unplugged DEF’s keyboard mid-raid",
+            "ATK sent DEF a ‘bruh’ in all lowercase",
+            "ATK told DEF that Lake Alice is actually just a puddle",
+            "ATK said DEF would never get a Chick-fil-A sandwich again",
+            "ATK made DEF walk from Library West to Rawlings in July",
+            "ATK stepped on DEF’s Crocs at Turlington",
+            "ATK made DEF miss the Reitz escalator entrance",
+            "ATK roasted DEF in the UF meme page comments"
         ],
-        "medium" : [
+        "medium": [
             "ATK hit DEF with a nasty left hook",
             "ATK kicked DEF really really hard",
             "ATK took away DEF's bright futures",
             "ATK exposed DEF's digital footprint to recruiters",
             "ATK kicked DEF from neetcoders",
             "ATK made DEF fail baby circuits",
-            "ATK pushed DEF off Tony's skybase"
+            "ATK pushed DEF off Tony's skybase",
+            "ATK deleted DEF’s GitHub repo",
+            "ATK told DEF to touch grass aggressively",
+            "ATK spilled coffee on DEF’s laptop",
+            "ATK showed DEF's meme history to the professor",
+            "ATK made DEF rewatch all the lectures at 1x speed",
+            "ATK made DEF bike uphill to Benton Hall in 100°F",
+            "ATK made DEF wait 40 minutes for a SNAP",
+            "ATK threw DEF into a Turlington preacher argument",
+            "ATK told DEF they missed the SGP ticket drop",
+            "ATK made DEF take STA2023 with no calculator",
+            "ATK convinced DEF to minor in philosophy for 'fun'"
         ],
-        "heavy" : [
+        "heavy": [
             "ATK hit DEF with a nail bat",
             "ATK hit DEF with a Sharp 5 netherite sword",
             "ATK made DEF listen to Shaboozey",
             "ATK left DEF on read",
-            "ATK made DEF take another Schwartz class"
+            "ATK made DEF take another Schwartz class",
+            "ATK turned off DEF’s Wi-Fi during finals week",
+            "ATK made DEF run 10 for-loops recursively",
+            "ATK sent DEF to office hours... on a Sunday",
+            "ATK invoked undefined behavior in DEF’s soul",
+            "ATK trapped DEF in Marston during a fire drill",
+            "ATK leaked DEF's failed ISIS exam to the group chat",
+            "ATK made DEF find parking on campus at noon",
+            "ATK made DEF go to Broward Dining sober",
+            "ATK made DEF present first in an 8:30 am class",
+            "ATK forced DEF to debug a segfault live on Zoom",
+            "ATK made DEF use Canvas on mobile"
         ],
-        "doomed" : [
+        "doomed": [
             "ATK banned DEF from neetcoders",
             "ATK talked bad about DEF to Fuchs",
             "ATK said DEF was really really lame",
-            "ATK won against DEF in the minecraft war"
+            "ATK won against DEF in the minecraft war",
+            "ATK got DEF shadowbanned from Handshake",
+            "ATK told DEF’s mom about their GPA",
+            "ATK forced DEF to TA baby circuits for eternity",
+            "ATK cast DEF into the merge conflict abyss",
+            "ATK dropped DEF from a full class after drop/add ended",
+            "ATK made DEF walk through Turlington during campaign season",
+            "ATK got DEF permanently stuck in a group project with all CS memes admins",
+            "ATK cursed DEF to 4 more years of gen eds",
+            "ATK made DEF eat Chick-fil-A at 11pm and deal with the consequences",
+            "ATK locked DEF inside McCarty C forever",
+            "ATK whispered ‘You missed the scholarship deadline’ into DEF’s soul"
         ]
     },
-    "heal" : [
+    "heal": [
         "HEAL drank some water",
         "HEAL ate a cookie",
-        "HEAL put a bandage on"
+        "HEAL put a bandage on",
+        "HEAL listened to lo-fi beats",
+        "HEAL pet a friendly cat",
+        "HEAL took a walk outside",
+        "HEAL got a hug from a homie",
+        "HEAL took a nap under a blanket",
+        "HEAL watched a comfort anime",
+        "HEAL brewed a cup of herbal tea",
+        "HEAL did a silly little dance",
+        "HEAL got Krishna Lunch",
+        "HEAL touched the Gator statue for good luck",
+        "HEAL sat under a palm tree outside Library West",
+        "HEAL caught a breeze while crossing Reitz",
+        "HEAL found a rare empty hammock near Marston",
+        "HEAL passed a surprise Canvas quiz"
     ]
 }
