@@ -94,7 +94,7 @@ function turn(hp1, hp2, f1, f2) {
         }
         
         [edits2, nhp1] = attack(f2, f1, hp1);
-        edits.concat(edits2);
+        edits = edits.concat(edits2);
         return [edits, nhp1, nhp2];
     }
     // player 2 goes first
@@ -105,7 +105,7 @@ function turn(hp1, hp2, f1, f2) {
         }
         
         [edits2, nhp2] = attack(f1, f2, hp2);
-        edits.concat(edits2);
+        edits = edits.concat(edits2);
         return [edits, nhp1, nhp2];
     }
 }
