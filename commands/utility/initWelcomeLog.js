@@ -22,7 +22,7 @@ module.exports = {
         }
 
         await Configurations.update({ channel: designated_channel.id }, { where: { field: 'welcome_channel' } });
-        console.log(`All welcome messages will be redirected to ${designated_channel.name}`)
+        console.log(`All welcome messages will be redirected to ${designated_channel.name}`);
         interaction.reply({
             content: `All welcome messages will be redirected to ${designated_channel}`,
             flags: MessageFlags.Ephemeral,
