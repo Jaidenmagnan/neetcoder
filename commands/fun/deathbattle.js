@@ -62,8 +62,8 @@ async function addCrown(avaURL) {
 function attack(attacker, defender, hp) {
     // user 1 turn
     let nhp = hp;
-    [dmg, atk] = getAttack();
     let edits = [];
+    [dmg, atk] = getAttack();
     s = atk.replace("ATK", attacker).replace("DEF", defender) + ` for **${dmg}** damage!\n`;
     edits.push(s);
 
@@ -83,11 +83,11 @@ function attack(attacker, defender, hp) {
 }
 
 function turn(hp1, hp2, f1, f2) {
-    let first = randInt(0, 2);
+    let first = Math.random();
     let nhp1 = hp1;
     let nhp2 = hp2;
     // player 1 goes first
-    if(first == 0) {
+    if(first < 0.5) {
         [edits, nhp2] = attack(f1, f2, hp2);
         if(nhp2 <= 0) {
             return [edits, nhp1, nhp2];
