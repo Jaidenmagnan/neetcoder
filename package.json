@@ -11,8 +11,12 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@balldontlie/sdk": "^1.2.2",
     "@napi-rs/canvas": "^0.1.70",
+    "bun": "^1.2.13",
     "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "node-fetch": "^3.3.2",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "undici": "^7.10.0"
