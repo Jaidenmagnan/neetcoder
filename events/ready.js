@@ -6,7 +6,8 @@ module.exports = {
     once: true,
     execute(client) {
         Users.sync({ force: true });
-        Configurations.sync({ force: true });
+        //Configurations.sync({ force: true });
+        Configurations.sync();
         console.log(`Ready! Logged in as ${client.user.tag}`);
     },
 };
