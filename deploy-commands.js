@@ -18,7 +18,7 @@ for (const folder of commandFolders) {
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
             commands.push(command.data.toJSON());
-        } 
+        }
         else {
             console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
@@ -32,13 +32,27 @@ const rest = new REST().setToken(process.env.TOKEN);
 (async () => {
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
+        const isDev = process.env.NODE_ENV === 'development';
+        const isProd = process.env.NODE_ENV === 'production';
+
+        let data;
 
         // The put method is used to fully refresh all commands in the guild with the current set
-        const data = await rest.put(
-            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-            //Routes.applicationCommands(clientId),
-            { body: commands },
-        );
+        if (isDev) {
+            data = await rest.put(
+                Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+                //Routes.applicationCommands(clientId),
+                { body: commands },
+            );
+        }
+
+        if (isProd) {
+            data = await rest.put(
+                Routes.applicationCommands(clientId),
+                { body: commands },
+            );
+
+        }
 
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
