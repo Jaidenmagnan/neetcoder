@@ -1,4 +1,3 @@
-
 ---
 name: ⭐ Feature
 about: A new feature for our bot
