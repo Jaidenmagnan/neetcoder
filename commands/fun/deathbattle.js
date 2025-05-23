@@ -1,8 +1,11 @@
-const { sleep } = require('bun');
 const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
 const text = require("./deathbattle.json");
 const Canvas = require('@napi-rs/canvas');
 const { request } = require('undici');
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function randInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
