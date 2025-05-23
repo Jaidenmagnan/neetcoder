@@ -2,8 +2,7 @@
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { token } = require('./config.json');
-
+require('dotenv').config();
 
 const client = new Client({
     intents: [
@@ -62,4 +61,4 @@ loadEvents();
 module.exports = { loadCommands, loadEvents };
 
 // Log in to Discord with your client's token
-client.login(token);
+client.login(process.env.TOKEN);
