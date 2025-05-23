@@ -9,11 +9,17 @@ module.exports = {
         .setDescription('check the level of your user'),
     async execute(interaction) {
         await interaction.deferReply();
-        let user = await Users.findOne({ where: { userid: interaction.user.id } });
+        let user = await Users.findOne({
+            where: {
+                userid: interaction.user.id,
+                guildid: interaction.guild.id,
+            },
+        });
 
         if (!user) {
             user = await Users.create({
                 userid: interaction.user.id,
+                guildid: interaction.guild.id,
                 message_count: 0,
                 level: 1,
             });
