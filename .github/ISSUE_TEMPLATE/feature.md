@@ -1,6 +1,6 @@
 ---
 name: ⭐ Feature
-about: A new feature for our bot
+about: Describe your idea for a new feature
 title: '[FEATURE] <title>'
 labels: Feature
 assignees: ''
@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 <!--
-Note: Please search to see if an issue already exists for the bug you encountered.
+Note: Please search to see if an issue already exists for the feature you plan to implement.
 -->
 
 ### Description
@@ -19,14 +19,13 @@ Note: Please search to see if an issue already exists for the bug you encountere
 
 ### Implementation Details:
 <!--
-Example: steps to implement the desired behavior
-1. In this environment...
-1. With this config...
-1. Run '...'
-1. See error...
+Example: steps to create the feature.
+1. Write a new command.
+2. Listen for new events.
+3. Run action.... 
 -->
 
 ### Anything else:
 <!--
-Links? References? Anything that will give us more context about the issue that you are encountering!
+Links? References? Anything that will give us more context about the feature you would like to implement!
 -->
