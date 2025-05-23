@@ -78,11 +78,17 @@ module.exports = {
 };
 
 async function logXp(message) {
-    let user = await Users.findOne({ where: { userid: message.author.id } });
+    let user = await Users.findOne({
+        where: {
+            userid: message.author.id,
+            guildid: message.guild.id,
+        },
+    });
 
     if (!user) {
         user = await Users.create({
             userid: message.author.id,
+            guildid: message.guild.id,
             message_count: 0,
             level: 1,
         });
@@ -96,7 +102,12 @@ async function logXp(message) {
 
 
     if (new_level > user_level) {
-        await Users.update({ level: new_level }, { where: { userid: message.author.id } });
+        await Users.update({ level: new_level }, {
+            where: {
+                userid: message.author.id,
+                guildid: message.guild.id,
+            },
+        });
 
         const userMention = `<@${message.author.id}>`;
         message.channel.send(`${userMention} you leveled up!`);

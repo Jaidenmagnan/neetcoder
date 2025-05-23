@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const { defaultValueSchemable } = require('sequelize/lib/utils');
 require('dotenv').config();
 
 const sequelize = process.env.DATABASE_URL 
@@ -43,6 +44,11 @@ const Users = sequelize.define('users', {
         defaultValue: 1,
         allowNull: false,
     },
+    guildid: {
+      type: Sequelize.STRING,
+      defaultValue: 1,
+      allowNull: false,
+    },
 });
 
 const Configurations = sequelize.define('configurations', {
@@ -55,6 +61,11 @@ const Configurations = sequelize.define('configurations', {
         type: Sequelize.STRING,
         allowNull: true,
         defaultValue: '',
+    },
+    guildid: {
+      type: Sequelize.STRING,
+      defaultValue: 1,
+      allowNull: false,
     },
 });
 
