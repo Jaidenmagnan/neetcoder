@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const { defaultValueSchemable } = require('sequelize/lib/utils');
 require('dotenv').config();
 
 const sequelize = process.env.DATABASE_URL 
@@ -30,6 +29,11 @@ const sequelize = process.env.DATABASE_URL
 
 // this is how we make a database table
 const Users = sequelize.define('users', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
     userid: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -52,6 +56,11 @@ const Users = sequelize.define('users', {
 });
 
 const Configurations = sequelize.define('configurations', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
     field: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -69,4 +78,28 @@ const Configurations = sequelize.define('configurations', {
     },
 });
 
-module.exports = { Users, Sequelize, Configurations };
+const ReactionRoles = sequelize.define('reaction_roles', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    messageid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    guildid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    emoji: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    roleid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+});
+
+module.exports = { Users, Sequelize, Configurations, ReactionRoles };
