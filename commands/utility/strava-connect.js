@@ -42,20 +42,19 @@ module.exports = {
                 return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
-            // first endpoint, reply to get message
+            // send initial message first to get the message ID
             const embed = new EmbedBuilder()
                 .setColor('#FC4C02')
                 .setTitle('🔗 Connect Your Strava Account')
-                .setDescription('Click the link below to connect your Strava account!')
-                .setFooter({ text: 'Generating authorization link...' })
+                .setDescription('Generating your connection link...')
                 .setTimestamp();
 
             await interaction.reply({ embeds: [embed], ephemeral: true });
 
-            // getting the reply message
+            // now get the actual message ID
             const reply = await interaction.fetchReply();
 
-            // message info for callback
+            // generate auth URL with real message ID
             const state = `${interaction.user.id}:${interaction.guild.id}:${interaction.channel.id}:${reply.id}`;
             const scopes = 'read,activity:read_all';
             const redirectUri = `${BASE_URL}/strava/callback`;
@@ -68,7 +67,7 @@ module.exports = {
                 `scope=${scopes}&` +
                 `state=${state}`;
 
-            // updating message with auth link 
+            // update message with real connection link
             const updatedEmbed = new EmbedBuilder()
                 .setColor('#FC4C02')
                 .setTitle('🔗 Connect Your Strava Account')
@@ -86,16 +85,26 @@ module.exports = {
         } catch (error) {
             console.error('Error in strava-connect command:', error);
             
+            // don't respond to expired interactions  
+            if (error.code === 10062) {
+                console.log('Interaction expired during connect');
+                return;
+            }
+            
             const errorEmbed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setTitle('❌ Error')
                 .setDescription('Something went wrong. Please try again.')
                 .setTimestamp();
 
-            if (interaction.replied || interaction.deferred) {
-                await interaction.editReply({ embeds: [errorEmbed] });
-            } else {
-                await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+            try {
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.editReply({ embeds: [errorEmbed] });
+                } else {
+                    await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+                }
+            } catch (replyError) {
+                console.log('Could not send error message');
             }
         }
     },

@@ -50,8 +50,6 @@ function loadCommands() {
     }
 }
 
-// message listener for reloading
-
 function loadEvents() {
     const eventsPath = path.join(__dirname, 'events');
     const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
