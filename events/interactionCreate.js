@@ -128,15 +128,15 @@ async function votetimeout(interaction) {
             content: "peace out lil bro",
         });
 
-        member.timeout(length, 'Timed out!');
+        await member.timeout(length, 'Timed out!');
 
-        Configurations.destroy({
+        await Configurations.destroy({
             where: {
                 id: config.get('id'),
             },
         });
 
-        Votes.destroy({
+        await Votes.destroy({
             where: {
                 messageid: interaction.message.id,
                 guildid: interaction.guild.id,
