@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const { defaultValueSchemable } = require('sequelize/lib/utils');
 require('dotenv').config();
 
 const sequelize = process.env.DATABASE_URL 
@@ -66,6 +67,26 @@ const Configurations = sequelize.define('configurations', {
         allowNull: false,
         defaultValue: '',
     },
+    messageid: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      defaultValue: '',
+    },
+    votes_needed: {
+      type:Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
+    length_of_timeout: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
+    userid: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      defaultValue: 0,
+    },
     channel: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -78,8 +99,32 @@ const Configurations = sequelize.define('configurations', {
     },
 });
 
+const Votes = sequelize.define('votes', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    guildid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    messageid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    userid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    votestatus: {
+      type:Sequelize.STRING,
+      allowNull: false,
+    },
+});
+
 const ReactionRoles = sequelize.define('reaction_roles', {
-      id: {
+    id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -102,4 +147,4 @@ const ReactionRoles = sequelize.define('reaction_roles', {
     },
 });
 
-module.exports = { Users, Sequelize, Configurations, ReactionRoles };
+module.exports = { Users, Sequelize, Configurations, ReactionRoles, Votes };

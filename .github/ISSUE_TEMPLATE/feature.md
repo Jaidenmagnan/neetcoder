@@ -14,9 +14,6 @@ Note: Please search to see if an issue already exists for the feature you plan t
 ### Description
 <!-- A concise description of what you want to implement. -->
 
-### Explanation:
-<!-- A concise explanation of why this would be a good feature. -->
-
 ### Implementation Details:
 <!--
 Example: steps to create the feature.
