@@ -156,6 +156,7 @@ async function postRunToDiscord(activity, stravaUser, channelId) {
         if (distance >= 13.1) emoji = '🏃‍♂️🏅'; // half marathon or more
         if (distance >= 26.2) emoji = '🏃‍♂️🏆'; // marathon or more
 
+        // create enhanced embed
         const embed = new EmbedBuilder()
             .setColor('#FC4C02')
             .setAuthor({
@@ -169,21 +170,122 @@ async function postRunToDiscord(activity, stravaUser, channelId) {
                 { name: '🏃‍♂️ Distance', value: `${distance.toFixed(1)} mi`, inline: true },
                 { name: '⏱️ Time', value: time, inline: true },
                 { name: '⚡ Pace', value: pace, inline: true }
-            )
-            .setFooter({ text: `📅 ${date} • Click title to view on Strava` })
-            .setTimestamp(new Date(activity.start_date));
+            );
 
-        // add elevation if available
-        if (activity.total_elevation_gain > 0) {
+        // add elevation if significant
+        if (activity.total_elevation_gain > 10) { // only show if > 10 meters
             const elevationFt = (activity.total_elevation_gain * 3.28084).toFixed(0);
             embed.addFields({ name: '📈 Elevation', value: `${elevationFt} ft`, inline: true });
         }
 
+        // add heart rate if available
+        if (activity.average_heartrate) {
+            const hrText = activity.max_heartrate 
+                ? `${Math.round(activity.average_heartrate)} avg • ${Math.round(activity.max_heartrate)} max`
+                : `${Math.round(activity.average_heartrate)} avg`;
+            embed.addFields({ name: '❤️ Heart Rate', value: `${hrText} bpm`, inline: true });
+        }
+
+        // add calories if available
+        if (activity.calories) {
+            embed.addFields({ name: '🔥 Calories', value: `${activity.calories}`, inline: true });
+        }
+
+        // add location if available
+        if (activity.location_city || activity.location_state) {
+            const location = [activity.location_city, activity.location_state, activity.location_country]
+                .filter(Boolean).join(', ');
+            embed.addFields({ name: '📍 Location', value: location, inline: false });
+        }
+
+        // add achievements if any
+        if (activity.achievement_count > 0) {
+            embed.addFields({ name: '🏆 Achievements', value: `${activity.achievement_count} new achievement${activity.achievement_count > 1 ? 's' : ''}!`, inline: true });
+        }
+
+        // add speed stats
+        if (activity.average_speed && activity.max_speed) {
+            const avgSpeedMph = (activity.average_speed * 2.237).toFixed(1); // m/s to mph
+            const maxSpeedMph = (activity.max_speed * 2.237).toFixed(1);
+            embed.addFields({ 
+                name: '💨 Speed', 
+                value: `${avgSpeedMph} mph avg • ${maxSpeedMph} mph max`, 
+                inline: true 
+            });
+        }
+
+        // add map if polyline exists
+        if (activity.map && activity.map.summary_polyline) {
+            const mapUrl = generateMapImage(activity.map.summary_polyline, distance);
+            if (mapUrl) {
+                embed.setImage(mapUrl);
+            }
+        }
+
+        // enhanced footer with more info
+        let footerText = `📅 ${date}`;
+        if (activity.kudos_count > 0) {
+            footerText += ` • 👍 ${activity.kudos_count} kudos`;
+        }
+        if (activity.comment_count > 0) {
+            footerText += ` • 💬 ${activity.comment_count} comments`;
+        }
+        footerText += ' • Click title to view on Strava';
+
+        embed.setFooter({ text: footerText })
+             .setTimestamp(new Date(activity.start_date));
+
         await channel.send({ embeds: [embed] });
-        console.log(`Posted run ${activity.id} to Discord channel ${channelId}`);
+        console.log(`Posted enhanced run ${activity.id} to Discord channel ${channelId}`);
 
     } catch (error) {
         console.error('Error posting to Discord:', error);
+    }
+}
+
+// Function to generate map image URL
+function generateMapImage(polyline, distance) {
+    try {
+        if (!polyline) return null;
+        
+        // Use Google Static Maps API (you'll need to add GOOGLE_MAPS_API_KEY to your .env)
+        const googleMapsKey = process.env.GOOGLE_MAPS_API_KEY;
+        if (!googleMapsKey) {
+            console.log('No Google Maps API key found, skipping map');
+            return null;
+        }
+
+        // Determine zoom level based on distance
+        let zoom = 14;
+        if (distance > 10) zoom = 12;
+        if (distance > 20) zoom = 11;
+        if (distance > 30) zoom = 10;
+
+        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?` +
+            `size=400x200&` +
+            `zoom=${zoom}&` +
+            `path=enc:${encodeURIComponent(polyline)}&` +
+            `path=color:0xff6600|weight:3|enc:${encodeURIComponent(polyline)}&` +
+            `key=${googleMapsKey}`;
+        
+        return mapUrl;
+    } catch (error) {
+        console.error('Error generating map:', error);
+        return null;
+    }
+}
+
+// Alternative: Use MapBox (free tier)
+function generateMapboxImage(polyline) {
+    try {
+        const mapboxToken = process.env.MAPBOX_ACCESS_TOKEN;
+        if (!mapboxToken) return null;
+
+        // Decode polyline to get coordinates (you'd need a polyline decoder)
+        // For now, return null - this would need additional setup
+        return null;
+    } catch (error) {
+        return null;
     }
 }
 
