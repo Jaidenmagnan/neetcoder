@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { StravaUsers } = require('../../models.js');
 
 module.exports = {
@@ -57,6 +57,7 @@ module.exports = {
                 athleteData = stravaUser.athlete_data;
             }
 
+            // token refresh logic
             const now = new Date();
             let accessToken = stravaUser.access_token;
 
@@ -90,17 +91,20 @@ module.exports = {
                 }
             }
 
+            // helper functions for formatting data
             const formatDistance = (distance) => {
                 if (!distance || distance === null || isNaN(distance)) {
                     return 'No data';
                 }
-                return `${(distance / 1000).toFixed(1)} km`;
+                const miles = (distance / 1000) * 0.621371; // convert meters to miles
+                return `${miles.toFixed(1)} mi`;
             };
 
             const formatNumber = (number) => {
                 return number || 0;
             };
 
+            // updated time formatting with exact minutes:seconds
             const formatTime = (seconds) => {
                 if (!seconds) return 'No data';
                 const hours = Math.floor(seconds / 3600);
@@ -115,20 +119,43 @@ module.exports = {
             };
 
             const formatPace = (distance, time) => {
-                if (!distance || !time) return 'No data';
-                const paceSeconds = time / (distance / 1000);
+                if (!distance || !time || distance <= 0 || time <= 0) return null;
+                const miles = (distance / 1000) * 0.621371; // convert to miles
+                const paceSeconds = time / miles; // seconds per mile
                 const minutes = Math.floor(paceSeconds / 60);
                 const seconds = Math.round(paceSeconds % 60);
-                return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
+                return `${minutes}:${seconds.toString().padStart(2, '0')}/mi`;
+            };
+
+            // helper to format stats with optional pace and longest
+            const formatStatsField = (totals, biggestDistance = null, showPace = false) => {
+                let text = `**${formatNumber(totals.count)}** activities\n**${formatDistance(totals.distance)}**\n**${formatTime(totals.moving_time)}**`;
+                
+                // only add pace if there's actual data (distance > 0 and moving_time > 0)
+                if (showPace && totals.distance > 0 && totals.moving_time > 0) {
+                    const miles = (totals.distance / 1000) * 0.621371;
+                    const paceSeconds = totals.moving_time / miles;
+                    const minutes = Math.floor(paceSeconds / 60);
+                    const seconds = Math.round(paceSeconds % 60);
+                    text += `\n**Avg Pace:** ${minutes}:${seconds.toString().padStart(2, '0')}/mi`;
+                }
+                
+                // only add longest if there's actual data (biggestDistance > 0)
+                if (biggestDistance && biggestDistance > 0 && !isNaN(biggestDistance)) {
+                    const miles = (biggestDistance / 1000) * 0.621371;
+                    text += `\n**Longest:** ${miles.toFixed(1)} mi`;
+                }
+                
+                return text;
             };
 
             if (activityType) {
-                // detailed view
+                // detailed view with interactive pagination
                 const [statsResponse, activitiesResponse] = await Promise.all([
                     fetch(`https://www.strava.com/api/v3/athletes/${athleteData.id}/stats`, {
                         headers: { 'Authorization': `Bearer ${accessToken}` }
                     }),
-                    fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=10&page=1`, {
+                    fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=200&page=1`, {
                         headers: { 'Authorization': `Bearer ${accessToken}` }
                     })
                 ]);
@@ -150,55 +177,92 @@ module.exports = {
                 const allTimeTotals = isRunning ? stats.all_run_totals : stats.all_ride_totals;
                 const biggestDistance = isRunning ? stats.biggest_run_distance : stats.biggest_ride_distance;
 
-                const embed = new EmbedBuilder()
-                    .setColor('#FC4C02')
-                    .setTitle(`${isRunning ? '🏃‍♂️' : '🚴‍♂️'} ${athleteData.firstname} ${athleteData.lastname} - ${isRunning ? 'Running' : 'Cycling'} Stats`)
-                    .setURL(`https://www.strava.com/athletes/${athleteData.id}`)
-                    .setThumbnail(athleteData.profile || null)
-                    .addFields(
-                        { 
-                            name: `📊 Recent (4 weeks)`, 
-                            value: `**${formatNumber(recentTotals.count)}** activities\n**${formatDistance(recentTotals.distance)}**\n**${formatTime(recentTotals.moving_time)}**\n**Avg Pace:** ${formatPace(recentTotals.distance, recentTotals.moving_time)}`, 
-                            inline: true 
-                        },
-                        { 
-                            name: `🏆 All-Time`, 
-                            value: `**${formatNumber(allTimeTotals.count)}** total\n**${formatDistance(allTimeTotals.distance)}**\n**${formatTime(allTimeTotals.moving_time)}**\n**Longest:** ${formatDistance(biggestDistance)}`, 
-                            inline: true 
-                        },
-                        { 
-                            name: `📈 This Year`, 
-                            value: `**${formatNumber(isRunning ? stats.ytd_run_totals.count : stats.ytd_ride_totals.count)}** activities\n**${formatDistance(isRunning ? stats.ytd_run_totals.distance : stats.ytd_ride_totals.distance)}**\n**${formatTime(isRunning ? stats.ytd_run_totals.moving_time : stats.ytd_ride_totals.moving_time)}**`, 
-                            inline: true 
-                        }
-                    );
+                // function to create embed for a specific page
+                const createEmbed = (page = 0, activitiesPerPage = 5) => {
+                    const startIndex = page * activitiesPerPage;
+                    const endIndex = startIndex + activitiesPerPage;
+                    const pageActivities = filteredActivities.slice(startIndex, endIndex);
+                    
+                    const embed = new EmbedBuilder()
+                        .setColor('#FC4C02')
+                        .setTitle(`${isRunning ? '🏃‍♂️' : '🚴‍♂️'} ${athleteData.firstname} ${athleteData.lastname} - ${isRunning ? 'Running' : 'Cycling'} Stats`)
+                        .setURL(`https://www.strava.com/athletes/${athleteData.id}`)
+                        .setThumbnail(athleteData.profile || null)
+                        .addFields(
+                            { 
+                                name: `📊 Recent (4 weeks)`, 
+                                value: formatStatsField(recentTotals, null, true), // show pace but no longest for recent
+                                inline: true 
+                            },
+                            { 
+                                name: `🏆 All-Time`, 
+                                value: formatStatsField(allTimeTotals, biggestDistance, false), // show longest but no pace for all-time
+                                inline: true 
+                            },
+                            { 
+                                name: `📈 This Year`, 
+                                value: formatStatsField(isRunning ? stats.ytd_run_totals : stats.ytd_ride_totals, null, false), // basic stats only
+                                inline: true 
+                            }
+                        );
 
-                // any recent activities, if any
-                if (filteredActivities.length > 0) {
-                    const recentActivitiesText = filteredActivities.slice(0, 5).map(activity => {
-                        const date = new Date(activity.start_date).toLocaleDateString();
-                        const distance = formatDistance(activity.distance);
-                        const time = formatTime(activity.moving_time);
-                        const pace = formatPace(activity.distance, activity.moving_time);
-                        
-                        return `[**${activity.name}**](https://www.strava.com/activities/${activity.id})\n${date} • ${distance} • ${time} • ${pace}`;
-                    }).join('\n\n');
+                    if (pageActivities.length > 0) {
+                        const recentActivitiesText = pageActivities.map(activity => {
+                            const date = new Date(activity.start_date).toLocaleDateString();
+                            const distance = formatDistance(activity.distance);
+                            const time = formatTime(activity.moving_time);
+                            const pace = formatPace(activity.distance, activity.moving_time);
+                            
+                            return `[**${activity.name}**](https://www.strava.com/activities/${activity.id})\n${date} • ${distance} • ${time}${pace ? ` • ${pace}` : ''}`;
+                        }).join('\n\n');
 
-                    embed.addFields({
-                        name: `🗓️ Recent ${isRunning ? 'Runs' : 'Rides'} (Last 5) - Click to view`,
-                        value: recentActivitiesText,
-                        inline: false
-                    });
-                }
+                        const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
+                        embed.addFields({
+                            name: `🗓️ Recent ${isRunning ? 'Runs' : 'Rides'} (Page ${page + 1}/${totalPages}) - Click to view`,
+                            value: recentActivitiesText,
+                            inline: false
+                        });
+                    }
 
-                embed.setFooter({ text: `Athlete ID: ${athleteData.id}` })
-                     .setTimestamp();
+                    embed.setFooter({ text: `Athlete ID: ${athleteData.id}` })
+                         .setTimestamp();
+                    
+                    return embed;
+                };
 
-                await interaction.editReply({ embeds: [embed] });
+                // function to create navigation buttons
+                const createButtons = (page = 0, activitiesPerPage = 5) => {
+                    const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
+                    
+                    const row = new ActionRowBuilder()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId(`strava_prev_${targetUser.id}_${activityType}_${page}_${activitiesPerPage}`)
+                                .setLabel('Previous')
+                                .setEmoji('⬅️')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(page === 0),
+                            new ButtonBuilder()
+                                .setCustomId(`strava_next_${targetUser.id}_${activityType}_${page}_${activitiesPerPage}`)
+                                .setLabel('Next')
+                                .setEmoji('➡️')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(page >= totalPages - 1)
+                        );
+                    
+                    return row;
+                };
+
+                const initialEmbed = createEmbed(0, 5);
+                const initialButtons = createButtons(0, 5);
+
+                await interaction.editReply({ 
+                    embeds: [initialEmbed], 
+                    components: [initialButtons] 
+                });
 
             } else {
                 // running and cycling overview
-                // TODO: make a better general dashboard
                 const statsResponse = await fetch(`https://www.strava.com/api/v3/athletes/${athleteData.id}/stats`, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
@@ -218,33 +282,28 @@ module.exports = {
                     .addFields(
                         { 
                             name: '🏃‍♂️ Recent Running (4 weeks)', 
-                            value: `**${formatNumber(stats.recent_run_totals.count)}** activities\n**${formatDistance(stats.recent_run_totals.distance)}**\n**${formatTime(stats.recent_run_totals.moving_time)}**`, 
+                            value: formatStatsField(stats.recent_run_totals, null, false),
                             inline: true 
                         },
                         { 
                             name: '🚴‍♂️ Recent Cycling (4 weeks)', 
-                            value: `**${formatNumber(stats.recent_ride_totals.count)}** activities\n**${formatDistance(stats.recent_ride_totals.distance)}**\n**${formatTime(stats.recent_ride_totals.moving_time)}**`, 
+                            value: formatStatsField(stats.recent_ride_totals, null, false),
                             inline: true 
                         },
                         { name: '\u200B', value: '\u200B', inline: true }, 
                         { 
                             name: '🏃‍♂️ All-Time Running', 
-                            value: `**${formatNumber(stats.all_run_totals.count)}** total runs\n**${formatDistance(stats.all_run_totals.distance)}**\n**${formatTime(stats.all_run_totals.moving_time)}**`, 
+                            value: formatStatsField(stats.all_run_totals, stats.biggest_run_distance, false),
                             inline: true 
                         },
                         { 
                             name: '🚴‍♂️ All-Time Cycling', 
-                            value: `**${formatNumber(stats.all_ride_totals.count)}** total rides\n**${formatDistance(stats.all_ride_totals.distance)}**\n**${formatTime(stats.all_ride_totals.moving_time)}**`, 
+                            value: formatStatsField(stats.all_ride_totals, stats.biggest_ride_distance, false),
                             inline: true 
                         },
-                        { name: '\u200B', value: '\u200B', inline: true },
-                        {
-                            name: '📊 Personal Bests', 
-                            value: `**Longest Run:** ${formatDistance(stats.biggest_run_distance)}\n**Longest Ride:** ${formatDistance(stats.biggest_ride_distance)}`, 
-                            inline: false 
-                        }
+                        { name: '\u200B', value: '\u200B', inline: true }
                     )
-                    .setFooter({ text: `💡 Use "activity" parameter for detailed stats with clickable links • Athlete ID: ${athleteData.id}` })
+                    .setFooter({ text: `💡 Use "activity" parameter for detailed stats with interactive navigation • Athlete ID: ${athleteData.id}` })
                     .setTimestamp();
 
                 await interaction.editReply({ embeds: [embed] });
