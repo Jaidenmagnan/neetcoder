@@ -105,7 +105,13 @@ module.exports = {
                 if (!seconds) return 'No data';
                 const hours = Math.floor(seconds / 3600);
                 const minutes = Math.floor((seconds % 3600) / 60);
-                return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                const secs = Math.floor(seconds % 60);
+                
+                if (hours > 0) {
+                    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                } else {
+                    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+                }
             };
 
             const formatPace = (distance, time) => {
@@ -147,6 +153,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setColor('#FC4C02')
                     .setTitle(`${isRunning ? '🏃‍♂️' : '🚴‍♂️'} ${athleteData.firstname} ${athleteData.lastname} - ${isRunning ? 'Running' : 'Cycling'} Stats`)
+                    .setURL(`https://www.strava.com/athletes/${athleteData.id}`)
                     .setThumbnail(athleteData.profile || null)
                     .addFields(
                         { 
@@ -172,11 +179,13 @@ module.exports = {
                         const date = new Date(activity.start_date).toLocaleDateString();
                         const distance = formatDistance(activity.distance);
                         const time = formatTime(activity.moving_time);
-                        return `**${activity.name}**\n${date} • ${distance} • ${time}`;
+                        const pace = formatPace(activity.distance, activity.moving_time);
+                        
+                        return `[**${activity.name}**](https://www.strava.com/activities/${activity.id})\n${date} • ${distance} • ${time} • ${pace}`;
                     }).join('\n\n');
 
                     embed.addFields({
-                        name: `🗓️ Recent ${isRunning ? 'Runs' : 'Rides'} (Last 5)`,
+                        name: `🗓️ Recent ${isRunning ? 'Runs' : 'Rides'} (Last 5) - Click to view`,
                         value: recentActivitiesText,
                         inline: false
                     });
@@ -204,6 +213,7 @@ module.exports = {
                     .setColor('#FC4C02')
                     .setTitle(`🏃‍♂️ ${athleteData.firstname} ${athleteData.lastname}`)
                     .setDescription('**Strava Activity Overview**')
+                    .setURL(`https://www.strava.com/athletes/${athleteData.id}`)
                     .setThumbnail(athleteData.profile || null)
                     .addFields(
                         { 
@@ -234,7 +244,7 @@ module.exports = {
                             inline: false 
                         }
                     )
-                    .setFooter({ text: `💡 Use "activity" parameter for detailed stats • Athlete ID: ${athleteData.id}` })
+                    .setFooter({ text: `💡 Use "activity" parameter for detailed stats with clickable links • Athlete ID: ${athleteData.id}` })
                     .setTimestamp();
 
                 await interaction.editReply({ embeds: [embed] });
