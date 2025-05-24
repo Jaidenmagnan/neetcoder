@@ -24,7 +24,15 @@ module.exports = {
     async execute(interaction) {
         const user = interaction.options.getUser('user');
         const num_votes = interaction.options.getInteger('numvotes');
-        const length = interaction.options.getNumber('length');
+        const length = interaction.options.getNumber('minutes');
+
+        if (num_votes == 0) {
+            await interaction.reply({
+                content: "more than 0 votes please",
+                MessageFlags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
 
         const yesButton = new ButtonBuilder()
             .setCustomId('vote_timeout_yes')
