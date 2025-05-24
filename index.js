@@ -10,6 +10,8 @@ require('./strava-server.js');
 // Import the setDiscordClient function
 const { setDiscordClient } = require('./strava-server.js');
 
+const { handleLeaderboardButton } = require('./commands/utility/strava-leaderboard.js');
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -37,7 +39,7 @@ function loadCommands() {
             const filePath = path.join(commandsPath, file);
             delete require.cache[require.resolve(filePath)];
             const command = require(filePath);
-            // Set a new item in the Collection with the key as the command name and the value as the exported module
+            
             if ('data' in command && 'execute' in command) {
                 delete require.cache[require.resolve(filePath)];
                 client.commands.set(command.data.name, command);
@@ -75,6 +77,34 @@ client.once(Events.ClientReady, readyClient => {
     setDiscordClient(readyClient);
     
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
+
+client.on(Events.InteractionCreate, async interaction => {
+    if (interaction.isChatInputCommand()) {
+        const command = interaction.client.commands.get(interaction.commandName);
+
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
+
+        try {
+            await command.execute(interaction);
+        } catch (error) {
+            console.error(error);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+            } else {
+                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
+        }
+    }
+
+    if (interaction.isButton()) {
+        if (await handleLeaderboardButton(interaction)) {
+            return;
+        }
+    }
 });
 
 module.exports = { loadCommands, loadEvents };

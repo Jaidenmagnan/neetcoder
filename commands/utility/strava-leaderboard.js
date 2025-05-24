@@ -1,16 +1,58 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { StravaUsers } = require('../../models.js');
+
+// distance categories for different views
+const DISTANCE_VIEWS = {
+    sprint: {
+        name: '⚡ Sprint Distances',
+        distances: {
+            '400m': 400,
+            '1/2 Mile': 804.67,
+            '1K': 1000
+        }
+    },
+    middle: {
+        name: '🏃‍♂️ Middle Distances', 
+        distances: {
+            '1 Mile': 1609.34,
+            '2 Mile': 3218.68,
+            '5K': 5000
+        }
+    },
+    distance: {
+        name: '🏔️ Distance Running',
+        distances: {
+            '10K': 10000,
+            'Half Marathon': 21097.5,
+            'Marathon': 42195
+        }
+    },
+    all: {
+        name: '📊 All Distances',
+        distances: {
+            '400m': 400,
+            '1/2 Mile': 804.67,
+            '1K': 1000,
+            '1 Mile': 1609.34,
+            '2 Mile': 3218.68,
+            '5K': 5000,
+            '10K': 10000,
+            'Half Marathon': 21097.5,
+            'Marathon': 42195
+        }
+    }
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('strava-leaderboard')
-        .setDescription('View leaderboard for different race distances'),
+        .setDescription('View interactive leaderboard for different race distances'),
     
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // get all connected users in this guild
+            // check if users are connected
             const stravaUsers = await StravaUsers.findAll({
                 where: { guild_id: interaction.guild.id }
             });
@@ -25,47 +67,9 @@ module.exports = {
                 return interaction.editReply({ embeds: [embed] });
             }
 
-            // target distances for personal bests (in meters)
-            const targetDistances = {
-                '1 Mile': 1609.34,
-                '2 Mile': 3218.68,  
-                '5K': 5000,
-                '10K': 10000
-            };
-
-            const leaderboards = {};
-            for (const distanceName of Object.keys(targetDistances)) {
-                leaderboards[distanceName] = [];
-            }
-
-            console.log(`Processing leaderboard for ${stravaUsers.length} users...`);
-
-            // process each user
-            for (const stravaUser of stravaUsers) {
-                try {
-                    const userResults = await getUserEstimatedBestEfforts(stravaUser, targetDistances, interaction.guild);
-                    
-                    // add user results to respective leaderboards
-                    for (const [distanceName, result] of Object.entries(userResults)) {
-                        if (result) {
-                            leaderboards[distanceName].push(result);
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Error processing user ${stravaUser.discord_user_id}:`, error);
-                    // continue processing other users
-                }
-            }
-
-            // sort leaderboards by time (fastest first)
-            for (const distanceName of Object.keys(leaderboards)) {
-                leaderboards[distanceName].sort((a, b) => a.time - b.time);
-                leaderboards[distanceName] = leaderboards[distanceName].slice(0, 10); // top 10
-            }
-
-            // create embed with original formatting restored
-            const embed = await createLeaderboardEmbed(leaderboards, interaction.guild);
-            await interaction.editReply({ embeds: [embed] });
+            // start with middle distances (most common) - keeping this as default
+            const { embed, row } = await createLeaderboardView('middle', stravaUsers, interaction.guild);
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Error in strava-leaderboard command:', error);
@@ -85,7 +89,151 @@ module.exports = {
     },
 };
 
-// function to estimate user's best efforts for target distances
+// create leaderboard view for specific distance category
+async function createLeaderboardView(viewType, stravaUsers, guild) {
+    const view = DISTANCE_VIEWS[viewType];
+    const leaderboards = {};
+    
+    // initialize leaderboards
+    for (const distanceName of Object.keys(view.distances)) {
+        leaderboards[distanceName] = [];
+    }
+
+    console.log(`Processing ${view.name} for ${stravaUsers.length} users...`);
+
+    // process each user
+    for (const stravaUser of stravaUsers) {
+        try {
+            const userResults = await getUserEstimatedBestEfforts(stravaUser, view.distances, guild);
+            
+            // add user results to respective leaderboards
+            for (const [distanceName, result] of Object.entries(userResults)) {
+                if (result) {
+                    leaderboards[distanceName].push(result);
+                }
+            }
+        } catch (error) {
+            console.error(`Error processing user ${stravaUser.discord_user_id}:`, error);
+        }
+    }
+
+    // sort leaderboards by time (fastest first)
+    for (const distanceName of Object.keys(leaderboards)) {
+        leaderboards[distanceName].sort((a, b) => a.time - b.time);
+        leaderboards[distanceName] = leaderboards[distanceName].slice(0, 10); // top 10
+    }
+
+    // create embed
+    const embed = createLeaderboardEmbed(leaderboards, view.name, viewType);
+    
+    // create button row with all 4 views
+    const row = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId('leaderboard_sprint')
+                .setLabel('Sprint')
+                .setEmoji('⚡')
+                .setStyle(viewType === 'sprint' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId('leaderboard_middle')
+                .setLabel('Middle')
+                .setEmoji('🏃‍♂️')
+                .setStyle(viewType === 'middle' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId('leaderboard_distance')
+                .setLabel('Distance')
+                .setEmoji('🏔️')
+                .setStyle(viewType === 'distance' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId('leaderboard_all')
+                .setLabel('All')
+                .setEmoji('📊')
+                .setStyle(viewType === 'all' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+        );
+
+    return { embed, row };
+}
+
+// create the leaderboard embed
+function createLeaderboardEmbed(leaderboards, viewName, viewType) {
+    const embed = new EmbedBuilder()
+        .setColor('#FC4C02')
+        .setTitle('🏆 Strava Running Leaderboard')
+        .setDescription(`**${viewName}**\n*Click buttons below to switch categories*`)
+        .setTimestamp();
+
+    // for "all" view, show fewer entries per distance to fit everything
+    const maxEntries = viewType === 'all' ? 3 : 5;
+
+    for (const [distanceName, results] of Object.entries(leaderboards)) {
+        if (results.length === 0) {
+            embed.addFields({
+                name: `🏃‍♂️ ${distanceName}`,
+                value: '*No times recorded*',
+                inline: true
+            });
+            continue;
+        }
+
+        let leaderboardText = '';
+        for (let i = 0; i < Math.min(results.length, maxEntries); i++) {
+            const result = results[i];
+            const position = i + 1;
+            const medal = position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}.`;
+            const username = result.discordUser.displayName || result.discordUser.user.username;
+            const timeLink = `[${formatTime(result.time)}](https://www.strava.com/activities/${result.activityId})`;
+            
+            leaderboardText += `${medal} **${username}** ${timeLink}\n`;
+        }
+
+        embed.addFields({
+            name: `🏃‍♂️ ${distanceName}`,
+            value: leaderboardText,
+            inline: true
+        });
+    }
+
+    embed.setFooter({ 
+        text: '📊 Based on best efforts from connected users • Click times to view on Strava' 
+    });
+
+    return embed;
+}
+
+// button interaction handler (add this to your main index.js)
+async function handleLeaderboardButton(interaction) {
+    if (!interaction.customId.startsWith('leaderboard_')) return false;
+
+    try {
+        await interaction.deferUpdate();
+
+        const viewType = interaction.customId.replace('leaderboard_', '');
+        
+        // get connected users
+        const stravaUsers = await StravaUsers.findAll({
+            where: { guild_id: interaction.guild.id }
+        });
+
+        if (stravaUsers.length === 0) {
+            return interaction.followUp({ 
+                content: '❌ No connected users found!', 
+                ephemeral: true 
+            });
+        }
+
+        // create new view
+        const { embed, row } = await createLeaderboardView(viewType, stravaUsers, interaction.guild);
+        await interaction.editReply({ embeds: [embed], components: [row] });
+
+        return true;
+    } catch (error) {
+        console.error('Error handling leaderboard button:', error);
+        return false;
+    }
+}
+
+// ... rest of your existing functions (getUserEstimatedBestEfforts, formatTime) stay the same ...
+
 async function getUserEstimatedBestEfforts(stravaUser, targetDistances, guild) {
     try {
         // get discord user info for display name
@@ -247,52 +395,11 @@ async function getUserEstimatedBestEfforts(stravaUser, targetDistances, guild) {
     }
 }
 
-// function to create the leaderboard embed (restored original formatting)
-async function createLeaderboardEmbed(leaderboards, guild) {
-    const embed = new EmbedBuilder()
-        .setColor('#FC4C02')
-        .setTitle('🏆 Strava Running Leaderboard')
-        .setDescription('**Best times by distance**')
-        .setTimestamp();
-
-    for (const [distanceName, results] of Object.entries(leaderboards)) {
-        if (results.length === 0) {
-            embed.addFields({
-                name: `🏃‍♂️ ${distanceName}`,
-                value: '*No times recorded*',
-                inline: true
-            });
-            continue;
-        }
-
-        let leaderboardText = '';
-        for (let i = 0; i < results.length; i++) {
-            const result = results[i];
-            const position = i + 1;
-            const medal = position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}.`;
-            const username = result.discordUser.displayName || result.discordUser.user.username;
-            const timeLink = `[${formatTime(result.time)}](https://www.strava.com/activities/${result.activityId})`;
-            
-            leaderboardText += `${medal} **${username}** ${timeLink}\n`;
-        }
-
-        embed.addFields({
-            name: `🏃‍♂️ ${distanceName}`,
-            value: leaderboardText,
-            inline: true
-        });
-    }
-
-    embed.setFooter({ 
-        text: '📊 Based on best times from connected users • Click times to view on Strava' 
-    });
-
-    return embed;
-}
-
-// helper function to format time in MM:SS format
 function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-} 
+}
+
+// export the button handler for use in index.js
+module.exports.handleLeaderboardButton = handleLeaderboardButton;
