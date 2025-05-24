@@ -29,7 +29,7 @@ module.exports = {
         try {
             const message = await interaction.channel.messages.fetch(message_id);
 
-            let reaction_role = await ReactionRoles.findOne({
+            const reaction_role = await ReactionRoles.findOne({
                 where: {
                     messageid: message_id,
                     guildid: interaction.guild.id,
@@ -41,29 +41,26 @@ module.exports = {
             if (reaction_role) {
                 await reaction_role.destroy();
 
-                try {
-                    const reaction = message.reactions.cache.get(emoji) ||
-                        message.reactions.cache.find(r => r.emoji.toString() === emoji);
-                    if (reaction) {
-                        await reaction.users.remove(interaction.client.user);
-                    }
-                } catch (reactionError) {
-                    console.log('Could not remove bot reaction:', reactionError.message);
+                const reaction = message.reactions.cache.get(emoji) ||
+                    message.reactions.cache.find(r => r.emoji.toString() === emoji);
+                if (reaction) {
+                    await reaction.users.remove(interaction.client.user);
                 }
 
                 await interaction.reply({
-                    content: 'Reaction role removed successfully!',
+                    content: 'reaction role removed',
                     flags: MessageFlags.Ephemeral,
                 });
             }
             else {
                 await interaction.reply({
-                    content: 'No reaction role found with those parameters.',
+                    content: 'no reaction role found',
                     flags: MessageFlags.Ephemeral,
                 });
             }
 
-        } catch (error) {
+        }
+        catch (error) {
             if (error.code === 10014) {
                 await interaction.reply({
                     content: 'emoji not found',
@@ -75,5 +72,5 @@ module.exports = {
                 flags: MessageFlags.Ephemeral,
             });
         }
-    }
-}
+    },
+};

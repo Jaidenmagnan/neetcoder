@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 require('dotenv').config();
@@ -10,6 +10,11 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessageReactions,
+    ],
+    partials: [
+        Partials.Message,
+        Partials.Channel,
+        Partials.Reaction,
     ],
 });
 
