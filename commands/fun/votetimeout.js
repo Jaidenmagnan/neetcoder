@@ -17,7 +17,7 @@ module.exports = {
         )
 
         .addNumberOption(option =>
-            option.setName('length')
+            option.setName('minutes')
                 .setDescription('the amount of time the user will be timedout for in minutes.'),
         ),
 
