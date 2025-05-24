@@ -91,18 +91,35 @@ client.on(Events.InteractionCreate, async interaction => {
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-            } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            console.error('❌ GLOBAL COMMAND ERROR:', error);
+            
+            // let the command handle its own errors - don't send duplicate messages
+            if (error.code === 10062) {
+                console.log('⚠️ Interaction expired at global level');
+                return;
             }
+            
+            // only send global error if the command hasn't already handled it
+            console.log('⚠️ Unhandled command error - command should handle this itself');
         }
     }
 
     if (interaction.isButton()) {
-        if (await handleLeaderboardButton(interaction)) {
-            return;
+        try {
+            if (await handleLeaderboardButton(interaction)) {
+                return;
+            }
+        } catch (error) {
+            console.error('❌ Button error:', error);
+            if (error.code !== 10062) {
+                try {
+                    if (!interaction.replied) {
+                        await interaction.reply({ content: 'Button interaction failed!', ephemeral: true });
+                    }
+                } catch (followUpError) {
+                    console.log('Could not send button error message');
+                }
+            }
         }
     }
 });

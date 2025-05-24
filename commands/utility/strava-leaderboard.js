@@ -49,15 +49,21 @@ module.exports = {
         .setDescription('View interactive leaderboard for different race distances'),
     
     async execute(interaction) {
+        console.log('🔄 Leaderboard command started');
+        
         try {
+            console.log('⏳ Attempting to defer reply...');
             await interaction.deferReply();
+            console.log('✅ Reply deferred successfully');
 
-            // check if users are connected
+            console.log('🔍 Fetching Strava users...');
             const stravaUsers = await StravaUsers.findAll({
                 where: { guild_id: interaction.guild.id }
             });
+            console.log(`📊 Found ${stravaUsers.length} Strava users`);
 
             if (stravaUsers.length === 0) {
+                console.log('❌ No users found, sending empty response');
                 const embed = new EmbedBuilder()
                     .setColor('#FF6B6B')
                     .setTitle('❌ No Connected Users')
@@ -67,23 +73,38 @@ module.exports = {
                 return interaction.editReply({ embeds: [embed] });
             }
 
-            // start with middle distances (most common) - keeping this as default
+            console.log('🏃‍♂️ Creating leaderboard view...');
             const { embed, row } = await createLeaderboardView('middle', stravaUsers, interaction.guild);
+            console.log('✅ Leaderboard view created, sending response...');
+            
             await interaction.editReply({ embeds: [embed], components: [row] });
+            console.log('🎉 Leaderboard sent successfully!');
 
         } catch (error) {
-            console.error('Error in strava-leaderboard command:', error);
+            console.error('❌ LEADERBOARD ERROR:', error);
+            console.error('Error stack:', error.stack);
             
-            const errorEmbed = new EmbedBuilder()
-                .setColor('#FF0000')
-                .setTitle('❌ Error')
-                .setDescription('Something went wrong retrieving the leaderboard.')
-                .setTimestamp();
+            // check if this is a Discord API error
+            if (error.code === 10062) {
+                console.log('⚠️ Interaction expired - not sending error message');
+                return; 
+            }
 
-            if (interaction.deferred) {
-                await interaction.editReply({ embeds: [errorEmbed] });
-            } else {
-                await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+            try {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('❌ Error')
+                    .setDescription('Something went wrong retrieving the leaderboard.')
+                    .setTimestamp();
+
+                if (interaction.deferred && !interaction.replied) {
+                    await interaction.editReply({ embeds: [errorEmbed] });
+                } else if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+                }
+                console.log('📝 Error message sent to user');
+            } catch (replyError) {
+                console.error('❌ Could not send error message:', replyError);
             }
         }
     },
