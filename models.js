@@ -102,4 +102,42 @@ const ReactionRoles = sequelize.define('reaction_roles', {
     },
 });
 
-module.exports = { Users, Sequelize, Configurations, ReactionRoles };
+// new database for strava integration
+const StravaUsers = sequelize.define('strava_users', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    discord_user_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    strava_athlete_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    access_token: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    refresh_token: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    expires_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+    },
+    athlete_data: {
+      type: Sequelize.JSON,
+      allowNull: true,
+    },
+    guild_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+});
+
+module.exports = { Users, Sequelize, Configurations, ReactionRoles, StravaUsers };

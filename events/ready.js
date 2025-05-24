@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { Users, Configurations, ReactionRoles } = require('../models.js');
+const { Users, Configurations, ReactionRoles, StravaUsers } = require('../models.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -8,6 +8,7 @@ module.exports = {
         Users.sync();
         Configurations.sync();
         ReactionRoles.sync();
+        StravaUsers.sync();
         console.log(`Ready! Logged in as ${client.user.tag}`);
     },
 };

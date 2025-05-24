@@ -3,6 +3,10 @@
   "module": "index.js",
   "type": "commonjs",
   "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "eslint": "^9.27.0"
@@ -12,10 +16,11 @@
   },
   "dependencies": {
     "@balldontlie/sdk": "^1.2.2",
-    "@napi-rs/canvas": "^0.1.70",
     "bun": "^1.2.13",
+    "cors": "^2.8.5",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "node-fetch": "^3.3.2",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",

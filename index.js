@@ -1,8 +1,14 @@
 // Require the necessary discord.js classes
-const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, Events } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 require('dotenv').config();
+
+// start strava server
+require('./strava-server.js');
+
+// Import the setDiscordClient function
+const { setDiscordClient } = require('./strava-server.js');
 
 const client = new Client({
     intents: [
@@ -63,6 +69,13 @@ function loadEvents() {
 
 loadCommands();
 loadEvents();
+
+client.once(Events.ClientReady, readyClient => {
+    // set discord cli for strava serv
+    setDiscordClient(readyClient);
+    
+    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
 
 module.exports = { loadCommands, loadEvents };
 
