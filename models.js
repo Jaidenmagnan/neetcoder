@@ -140,4 +140,16 @@ const StravaUsers = sequelize.define('strava_users', {
     },
 });
 
-module.exports = { Users, Sequelize, Configurations, ReactionRoles, StravaUsers };
+const RunChannels = sequelize.define('run_channels', {
+  guild_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      unique: true
+  },
+  channel_id: {
+      type: Sequelize.STRING,
+      allowNull: false
+  }
+});
+
+module.exports = { Users, Sequelize, Configurations, ReactionRoles, StravaUsers, RunChannels };

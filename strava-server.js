@@ -1,5 +1,5 @@
 const express = require('express');
-const { StravaUsers } = require('./models.js');
+const { StravaUsers, RunChannels } = require('./models.js');
 const { EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 
@@ -13,6 +13,202 @@ function setDiscordClient(client) {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// webhook verification endpoint (req by Strava)
+app.get('/strava/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    // verify the webhook subscription
+    if (mode === 'subscribe' && token === process.env.STRAVA_WEBHOOK_VERIFY_TOKEN) {
+        console.log('Webhook verified!');
+        res.json({ 'hub.challenge': challenge });
+    } else {
+        res.status(403).send('Forbidden');
+    }
+});
+
+// webhook event receiver
+app.post('/strava/webhook', async (req, res) => {
+    try {
+        const { object_type, aspect_type, object_id, owner_id } = req.body;
+        
+        console.log('Received webhook:', req.body);
+
+        // only process activity creations
+        if (object_type === 'activity' && aspect_type === 'create') {
+            await handleNewActivity(object_id, owner_id);
+        }
+
+        res.status(200).send('OK');
+    } catch (error) {
+        console.error('Webhook processing error:', error);
+        res.status(500).send('Error');
+    }
+});
+
+// func to handle new activities
+async function handleNewActivity(activityId, athleteId) {
+    try {
+        // find the user in our database
+        const stravaUser = await StravaUsers.findOne({
+            where: { strava_athlete_id: athleteId.toString() }
+        });
+
+        if (!stravaUser) {
+            console.log(`No registered user found for athlete ${athleteId}`);
+            return;
+        }
+
+        // get the run channel for this guild
+        const runChannel = await RunChannels.findOne({
+            where: { guild_id: stravaUser.guild_id }
+        });
+
+        if (!runChannel) {
+            console.log(`No run channel configured for guild ${stravaUser.guild_id}`);
+            return;
+        }
+
+        // get access token (refresh if needed)
+        let accessToken = stravaUser.access_token;
+        const now = new Date();
+
+        if (stravaUser.expires_at <= now) {
+            const refreshResponse = await fetch('https://www.strava.com/oauth/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    client_id: process.env.STRAVA_CLIENT_ID,
+                    client_secret: process.env.STRAVA_CLIENT_SECRET,
+                    refresh_token: stravaUser.refresh_token,
+                    grant_type: 'refresh_token'
+                })
+            });
+
+            const tokenData = await refreshResponse.json();
+            if (tokenData.access_token) {
+                accessToken = tokenData.access_token;
+                await stravaUser.update({
+                    access_token: tokenData.access_token,
+                    refresh_token: tokenData.refresh_token,
+                    expires_at: new Date(tokenData.expires_at * 1000)
+                });
+            }
+        }
+
+        // fetch the activity details
+        const activityResponse = await fetch(`https://www.strava.com/api/v3/activities/${activityId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (!activityResponse.ok) {
+            console.error('Failed to fetch activity details');
+            return;
+        }
+
+        const activity = await activityResponse.json();
+
+        // only post running activities
+        if (activity.type !== 'Run') {
+            console.log(`Activity ${activityId} is not a run, skipping`);
+            return;
+        }
+
+        // post to discord channel
+        await postRunToDiscord(activity, stravaUser, runChannel.channel_id);
+
+    } catch (error) {
+        console.error('Error handling new activity:', error);
+    }
+}
+
+async function postRunToDiscord(activity, stravaUser, channelId) {
+    try {
+        if (!discordClient) {
+            console.error('Discord client not available');
+            return;
+        }
+
+        const channel = await discordClient.channels.fetch(channelId);
+        if (!channel) {
+            console.error('Run channel not found');
+            return;
+        }
+
+        // get athlete data
+        let athleteData;
+        if (typeof stravaUser.athlete_data === 'string') {
+            athleteData = JSON.parse(stravaUser.athlete_data);
+        } else {
+            athleteData = stravaUser.athlete_data;
+        }
+
+        // format the activity data
+        const distance = (activity.distance / 1000) * 0.621371; // convert to miles
+        const time = formatTime(activity.moving_time);
+        const pace = formatPace(activity.distance, activity.moving_time);
+        const date = new Date(activity.start_date).toLocaleDateString();
+
+        // determine emoji based on distance
+        let emoji = '🏃‍♂️';
+        if (distance >= 13.1) emoji = '🏃‍♂️🏅'; // half marathon or more
+        if (distance >= 26.2) emoji = '🏃‍♂️🏆'; // marathon or more
+
+        const embed = new EmbedBuilder()
+            .setColor('#FC4C02')
+            .setAuthor({
+                name: `${athleteData.firstname} ${athleteData.lastname}`,
+                iconURL: athleteData.profile,
+                url: `https://www.strava.com/athletes/${athleteData.id}`
+            })
+            .setTitle(`${emoji} ${activity.name}`)
+            .setURL(`https://www.strava.com/activities/${activity.id}`)
+            .addFields(
+                { name: '🏃‍♂️ Distance', value: `${distance.toFixed(1)} mi`, inline: true },
+                { name: '⏱️ Time', value: time, inline: true },
+                { name: '⚡ Pace', value: pace, inline: true }
+            )
+            .setFooter({ text: `📅 ${date} • Click title to view on Strava` })
+            .setTimestamp(new Date(activity.start_date));
+
+        // add elevation if available
+        if (activity.total_elevation_gain > 0) {
+            const elevationFt = (activity.total_elevation_gain * 3.28084).toFixed(0);
+            embed.addFields({ name: '📈 Elevation', value: `${elevationFt} ft`, inline: true });
+        }
+
+        await channel.send({ embeds: [embed] });
+        console.log(`Posted run ${activity.id} to Discord channel ${channelId}`);
+
+    } catch (error) {
+        console.error('Error posting to Discord:', error);
+    }
+}
+
+// helper funcs
+function formatTime(seconds) {
+    if (!seconds) return 'No data';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+}
+
+function formatPace(distance, time) {
+    if (!distance || !time || distance <= 0 || time <= 0) return 'No data';
+    const miles = (distance / 1000) * 0.621371;
+    const paceSeconds = time / miles;
+    const minutes = Math.floor(paceSeconds / 60);
+    const seconds = Math.round(paceSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}/mi`;
+}
 
 // oauth callback endpoint
 app.get('/strava/callback', async (req, res) => {
@@ -153,6 +349,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Strava webhook server running on port ${PORT}`);
     console.log(`📍 OAuth callback URL: http://localhost:${PORT}/strava/callback`);
+    console.log(`🔗 Webhook URL: http://localhost:${PORT}/strava/webhook`);
 });
 
 module.exports = { app, setDiscordClient }; 
