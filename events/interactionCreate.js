@@ -48,7 +48,7 @@ async function votetimeout(interaction) {
     if (vote) {
         await interaction.reply({
             content: 'you already voted!',
-            MessageFlags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -64,7 +64,7 @@ async function votetimeout(interaction) {
     if (!config) {
         await interaction.reply({
             content: 'this vote is closed!',
-            MessageFlags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }

@@ -29,7 +29,7 @@ module.exports = {
         if (num_votes == 0) {
             await interaction.reply({
                 content: "more than 0 votes please",
-                MessageFlags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
