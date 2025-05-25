@@ -16,7 +16,7 @@ module.exports = {
 
         await interaction.reply({
             content: "sure thing dad!",
-            flags: MessageFlags.Epheremal,
+            flags: MessageFlags.Ephemeral,
         });
         await interaction.channel.send({ embeds: [embed] });
     },
