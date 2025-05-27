@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 
-let fetch; // will be dynamically imported inside the execute() function
+let fetch; 
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,7 +18,7 @@ module.exports = {
     const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
     const url = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&key=${apiKey}`;
 
-    // Dynamically import fetch if not already loaded
+    
     if (!fetch) {
       fetch = (await import('node-fetch')).default;
     }
