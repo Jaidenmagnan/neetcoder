@@ -27,7 +27,8 @@
     "node-fetch": "^2.6.9",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "undici": "^7.10.0"
   },
   "optionalDependencies": {
     "@napi-rs/canvas": "^0.1.44"

@@ -4,7 +4,7 @@ module.exports = {
     // use a \n to do a new line
     data: new SlashCommandBuilder()
         .setName('send')
-        .setDescription('Sends a message but from the bot')
+        .setDescription('sends a message from the bot')
 
         .addStringOption(option =>
             option.setName('message')
@@ -32,7 +32,7 @@ module.exports = {
             // Validate hex color code
             if (!/^[0-9A-F]{6}$/i.test(color)) {
                 await interaction.reply({
-                    content: 'Invalid color code! Please use a valid hex color (e.g., FF0000 or #FF0000)',
+                    content: 'invalid color code',
                     flags: MessageFlags.Ephemeral,
                 });
                 return;
@@ -47,14 +47,14 @@ module.exports = {
             await targetChannel.send({ embeds: [embed] });
 
             await interaction.reply({
-                content: `Message sent successfully to ${targetChannel.name}!`,
+                content: `message sent to ${targetChannel.name}!`,
                 flags: MessageFlags.Ephemeral,
             });
         }
         catch (error) {
-            console.error('Error sending message:', error);
+            console.error('error sending message:', error);
             await interaction.reply({
-                content: 'An error occurred while sending the message.',
+                content: 'error sending message',
                 flags: MessageFlags.Ephemeral,
             });
         }
