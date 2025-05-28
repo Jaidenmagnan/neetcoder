@@ -1,9 +1,11 @@
 const Sequelize = require('sequelize');
 require('dotenv').config();
 
-const sequelize = process.env.DATABASE_URL 
-  ? // production db
-    new Sequelize(process.env.DATABASE_URL, {
+let sequelize;
+
+try {
+  if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
       dialect: 'postgres',
       protocol: 'postgres',
       logging: false,
@@ -13,19 +15,46 @@ const sequelize = process.env.DATABASE_URL
           rejectUnauthorized: false,
         },
       },
-    })
-  : // local db
-    new Sequelize(
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      }
+    });
+  } else {
+    // local db
+    sequelize = new Sequelize(
       process.env.DB_NAME,
       process.env.DB_USER,
-      process.env.DB_PASS, 
+      process.env.DB_PASS,
       {
         host: process.env.DB_HOST,
         dialect: 'postgres',
         port: process.env.DB_PORT,
         logging: false,
-      },
+        pool: {
+          max: 5,
+          min: 0,
+          acquire: 30000,
+          idle: 10000
+        }
+      }
     );
+  }
+
+  // test
+  sequelize.authenticate()
+    .then(() => {
+      console.log('✅ Database connection established successfully.');
+    })
+    .catch(err => {
+      console.error('❌ Unable to connect to the database:', err);
+    });
+} catch (error) {
+  console.error('❌ Database configuration error:', error);
+  process.exit(1);
+}
 
 // this is how we make a database table
 const Users = sequelize.define('users', {

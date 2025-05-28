@@ -49,7 +49,7 @@ module.exports = {
                 .setDescription('Generating your connection link...')
                 .setTimestamp();
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({ embeds: [embed] });
 
             // now get the actual message ID
             const reply = await interaction.fetchReply();
