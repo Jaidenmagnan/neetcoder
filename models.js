@@ -147,4 +147,25 @@ const ReactionRoles = sequelize.define('reaction_roles', {
     },
 });
 
-module.exports = { Users, Sequelize, Configurations, ReactionRoles, Votes };
+const Books = sequelize.define('books', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_id: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: Sequelize.ENUM('read', 'unread'),
+    defaultValue: 'unread',
+    allowNull: false,
+  },
+});
+
+module.exports = { Users, Sequelize, Configurations, ReactionRoles, Votes, Books};
