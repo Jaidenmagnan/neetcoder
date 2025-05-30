@@ -2,9 +2,11 @@ const Sequelize = require('sequelize');
 const { defaultValueSchemable } = require('sequelize/lib/utils');
 require('dotenv').config();
 
-const sequelize = process.env.DATABASE_URL 
-  ? // production db
-    new Sequelize(process.env.DATABASE_URL, {
+let sequelize;
+
+try {
+  if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
       dialect: 'postgres',
       protocol: 'postgres',
       logging: false,
@@ -14,19 +16,46 @@ const sequelize = process.env.DATABASE_URL
           rejectUnauthorized: false,
         },
       },
-    })
-  : // local db
-    new Sequelize(
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      }
+    });
+  } else {
+    // local db
+    sequelize = new Sequelize(
       process.env.DB_NAME,
       process.env.DB_USER,
-      process.env.DB_PASS, 
+      process.env.DB_PASS,
       {
         host: process.env.DB_HOST,
         dialect: 'postgres',
         port: process.env.DB_PORT,
         logging: false,
-      },
+        pool: {
+          max: 5,
+          min: 0,
+          acquire: 30000,
+          idle: 10000
+        }
+      }
     );
+  }
+
+  // test
+  sequelize.authenticate()
+    .then(() => {
+      console.log('✅ Database connection established successfully.');
+    })
+    .catch(err => {
+      console.error('❌ Unable to connect to the database:', err);
+    });
+} catch (error) {
+  console.error('❌ Database configuration error:', error);
+  process.exit(1);
+}
 
 // this is how we make a database table
 const Users = sequelize.define('users', {
@@ -147,6 +176,56 @@ const ReactionRoles = sequelize.define('reaction_roles', {
     },
 });
 
+// new database for strava integration
+const StravaUsers = sequelize.define('strava_users', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    discord_user_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    strava_athlete_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    access_token: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    refresh_token: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    expires_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+    },
+    athlete_data: {
+      type: Sequelize.JSON,
+      allowNull: true,
+    },
+    guild_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+});
+
+const RunChannels = sequelize.define('run_channels', {
+  guild_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      unique: true
+  },
+  channel_id: {
+      type: Sequelize.STRING,
+      allowNull: false
+  }
+});
+
 const Books = sequelize.define('books', {
   id: {
     type: Sequelize.INTEGER,
@@ -168,4 +247,5 @@ const Books = sequelize.define('books', {
   },
 });
 
-module.exports = { Users, Sequelize, Configurations, ReactionRoles, Votes, Books};
+
+module.exports = { Users, Sequelize, Configurations, ReactionRoles, Votes, StravaUsers, RunChannels, Books };
