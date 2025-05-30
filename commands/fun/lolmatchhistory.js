@@ -26,33 +26,16 @@ module.exports = {
 
         const match_ids = await getMatchIds(puuid);
 
-        let total_kills = 0;
-        let total_deaths = 0;
-        let total_assists = 0;
-        let total_games = 0;
-        let total_wins = 0;
-
-        for (let i = 0; i < Math.min(match_ids.length, 20); i++) {
+        for (let i = 0; i < Math.min(match_ids.length, 10); i++) {
             const match_data = await getMatchData(match_ids[i]);
 
             const pix = match_data['metadata']['participants'].findIndex(p => p == puuid);
             const user_match_data = match_data['info']['participants'][pix];
 
-            total_kills += user_match_data['kills'];
-            total_deaths += user_match_data['deaths'];
-            total_assists += user_match_data['assists'];
-            total_wins += user_match_data['win'] == 1 ? 1 : 0;
-
-            total_games += 1;
         }
 
-        const win_rate = total_wins / total_games;
-        const averageK = total_kills / total_games;
-        const averageD = total_deaths / total_games;
-        const averageA = total_assists / total_games;
-
-        const playerEmbed = new EmbedBuilder()
-            .setTitle(`${profile_name} - league stats`)
+          const playerEmbed = new EmbedBuilder()
+            .setTitle(`${profile_name} - match history`)
             .setColor(0x0099FF)
             //.setThumbnail(profileIconUrl)
             .addFields(
@@ -102,4 +85,5 @@ async function getMatchData(match_id) {
     return match_data;
 
 }
+
 
