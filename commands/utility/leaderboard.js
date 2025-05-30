@@ -13,7 +13,7 @@ module.exports = {
             where: {
                 guildid: interaction.guild.id,
             },
-            order: [['level', 'DESC']],
+            order: [['message_count', 'DESC']],
             limit: 10,
         });
 
