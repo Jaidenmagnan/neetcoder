@@ -101,7 +101,6 @@ async function votetimeout(interaction) {
     let num_yes = 0;
 
 
-
     const member = await interaction.guild.members.fetch(user_id);
 
     votes.forEach(element => {

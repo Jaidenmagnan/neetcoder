@@ -10,8 +10,6 @@ module.exports = {
         ReactionRoles.sync({ alter: true });
         Votes.sync();
         Books.sync();
-        StravaUsers.sync();
-        RunChannels.sync();
         console.log(`Ready! Logged in as ${client.user.tag}`);
     },
 };

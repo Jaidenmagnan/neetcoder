@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { Books } = require('../../models.js'); 
-const { MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { Books } = require('../../models.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,7 +13,10 @@ module.exports = {
       const books = await Books.findAll({ where: { user_id: userId } });
 
       if (books.length === 0) {
-        return interaction.reply({ content: 'Your TBR list is empty!', ephemeral: true });
+        return interaction.reply({ 
+          content: 'Your TBR list is empty!', 
+          flags: MessageFlags.Ephemeral 
+        });
       }
 
       const unreadBooks = books.filter(b => b.status === 'unread');
@@ -37,13 +39,17 @@ module.exports = {
         content: 'Sent!', 
         flags: MessageFlags.Ephemeral 
       });
-      
+
     } catch (error) {
       console.error(error);
-      await interaction.reply({ 
-        content: 'Failed to fetch list', 
-        flags: MessageFlags.Ephemeral 
-      });
+      try {
+        await interaction.reply({ 
+          content: '❌ Failed to fetch your list or send a DM.', 
+          flags: MessageFlags.Ephemeral 
+        });
+      } catch (e) {
+        console.error('❗ Reply failed:', e);
+      }
     }
   },
 };

@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { Books } = require('../../models.js'); 
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { Books } = require('../../models.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -22,10 +22,24 @@ module.exports = {
         status: 'unread',
       });
 
-      await interaction.reply(`✅ Added **${title}** to your TBR list.`);
+      await interaction.reply({
+        content: `✅ Added **${title}** to your TBR list.`,
+        flags: MessageFlags.Ephemeral // correct way to hide response
+      });
+
     } catch (error) {
-      console.error(error);
-      await interaction.reply('❌ Failed to add the book.');
+      console.error('Error adding book:', error);
+
+      const replyContent = {
+        content: '❌ Failed to add the book.',
+        flags: MessageFlags.Ephemeral
+      };
+
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply(replyContent);
+      } else {
+        await interaction.followUp(replyContent);
+      }
     }
   },
 };
