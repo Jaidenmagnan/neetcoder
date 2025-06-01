@@ -25,19 +25,20 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    await interaction.deferReply();
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
     const profile_name = interaction.options.getString("summoner_name");
     const tag = interaction.options.getString("tag").replace("#", "");
 
     const data = await getLolPuuid(profile_name, tag);
 
     if (!data) {
-      await interaction.editReply({
-        content: "summoner not found",
-        flags: MessageFlags.Ephemeral,
-      });
+      await interaction.editReply({ content: "summoner not found" });
       return;
     }
+
+    await interaction.editReply({ content: "summoner found!" });
 
     const puuid = data.puuid;
 
