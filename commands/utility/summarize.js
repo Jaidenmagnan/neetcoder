@@ -20,7 +20,7 @@ module.exports = {
                 messages: [
                     {
                         role: "system",
-                        content: "You are a helpful assistant that summarizes conversations. Provide a concise summary of the following messages, highlighting the main points and key discussion topics.",
+                        content: "You are a helpful assistant that summarizes conversations. Provide a concise pretty, and organized summary of the following messages, highlighting the main points and key discussion topics.",
                     },
                     {
                         role: "user",
