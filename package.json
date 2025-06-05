@@ -17,6 +17,7 @@
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "node-fetch": "^3.3.2",
+    "openai": "^5.1.0",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
