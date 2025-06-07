@@ -5,6 +5,6 @@ module.exports = {
     .setName('tony')
     .setDescription('Replies with :tonyfreaky:'),
   async execute(interaction) {
-    await interaction.reply(':tonyfreaky:');
+    await interaction.reply('<:tonyfreaky:1364665263877918821>');
   },
 };
