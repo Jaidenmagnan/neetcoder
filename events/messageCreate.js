@@ -59,7 +59,7 @@ module.exports = {
         await message.reply("Hi!");
       }
     } else {
-      let r = Math.floor(Math.random() * 200);
+      let r = Math.floor(Math.random() * 500);
       if (r == 0) {
         await message.reply("Hi!");
       } else if (
