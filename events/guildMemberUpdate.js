@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { logRoleUpdate } = require("../events/ModerationLog")
+const { logRoleUpdate } = require("../events/moderationLog")
 
 module.exports = {
   name: Events.GuildMemberUpdate,
