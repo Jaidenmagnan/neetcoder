@@ -14,16 +14,12 @@ module.exports = {
                 author = message.member.nickname;
             }
         
-            let linkIdx = message.content.indexOf("x.com");
-            let leading = message.content.slice(0, linkIdx);
-            let trailing = message.content.slice(linkIdx+5);
+            let msg = message.content.replace("x.com", "fixvx.com");
         
             let result = "**" +
                         author +
                         " shared a tweet:**\n" +
-                        leading +
-                        "fixvx.com" + 
-                        trailing;
+                        msg;
         
             await message.channel.send(result);
             await message.delete();
