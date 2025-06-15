@@ -53,11 +53,6 @@ module.exports = {
       } else {
         await message.reply("What do you want from me.");
       }
-    } else if (message.author == "345964126096326658") {
-      const r = Math.floor(Math.random() * 20);
-      if (r == 0) {
-        await message.reply("Hi!");
-      }
     } else {
       let r = Math.floor(Math.random() * 500);
       if (r == 0) {
