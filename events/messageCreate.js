@@ -61,40 +61,35 @@ module.exports = {
                         "Oops! The story generator had a brain fart. Please try again!"
                     );
                 }
-            } catch (error) {
-                console.error("Error in message handler:", error);
-                await message.channel.send(
-                    "Oops! Something went wrong. Please try again!"
-                );
-            }
-        } else if (message.content.trim() == "<@1373490238277550202>") {
-            if (message.author == "736025260800868423") {
-               await message.reply("Can u leave me alone ur actually weird...");
-            } else {
-                await message.reply("What do you want from me.");
-            }
-        } else if (message.author == "345964126096326658") {
-            const r = Math.floor(Math.random() * 20);
-            if (r == 0) {
-                await message.reply("Hi!");
-            }
-        } else {
-            let r = Math.floor(Math.random() * 500);
-            if (r == 0) {
-                await message.reply("Hi!");
-            } else if (
-                message.author == "314903883874828288" ||
-                message.author == "210133839861907456"
-            ) {
-                r = Math.floor(Math.random() * 500);
-                if (r == 0) {
-                    await message.reply("ur fat :joy:");
-                    await message.reply(
-                        "https://tenor.com/view/hulk-smash-gif-12677792749566644516"
-                    );
-                }
-            }
+      } catch (error) {
+        console.error("Error in message handler:", error);
+        await message.channel.send(
+          "Oops! Something went wrong. Please try again!"
+        );
+      }
+    } else if (message.content.trim() == "<@1373490238277550202>") {
+      if (message.author == "736025260800868423") {
+        await message.reply("Can u leave me alone ur actually weird...");
+      } else {
+        await message.reply("What do you want from me.");
+      }
+    } else {
+      let r = Math.floor(Math.random() * 500);
+      if (r == 0) {
+        await message.reply("Hi!");
+      } else if (
+        message.author == "314903883874828288" ||
+        message.author == "210133839861907456"
+      ) {
+        r = Math.floor(Math.random() * 500);
+        if (r == 0) {
+          await message.reply("ur fat :joy:");
+          await message.reply(
+            "https://tenor.com/view/hulk-smash-gif-12677792749566644516"
+          );
         }
+      }
+    }
 
         try {
             await logXp(message);
