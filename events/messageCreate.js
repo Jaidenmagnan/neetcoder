@@ -9,6 +9,32 @@ module.exports = {
 
     if (message.author.bot) return;
 
+    // - DG: Fix x.com links ---
+    {
+      if (message.content.includes("https://x.com")) {
+        let author
+        if (message.member.nickname !== null) {
+          author = message.member.nickname
+        }
+        else {
+          author = message.author.username
+        }
+
+        let xLinkIdx = message.content.indexOf("x.com")
+        let before = message.content.slice(0, xLinkIdx)
+        let after = message.content.slice(xLinkIdx+5)
+        let result = "**" +
+                    author +
+                    " sent the following X post:**\n" +
+                    before +
+                    "fixvx.com" + 
+                    after;
+
+        await message.channel.send(result)
+        await message.delete()
+      }
+    }
+    
     if (message.content == "<@1373490238277550202> reload") {
       // check message author
       const { loadCommands, loadEvents } = require("../index.js");
