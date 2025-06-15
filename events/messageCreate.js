@@ -9,29 +9,26 @@ module.exports = {
 
     if (message.author.bot) return;
 
-    // - DG: Fix x.com links ---
+    // - dg: Fix x.com links ---
     {
       if (message.content.includes("https://x.com")) {
-        let author
+        let author = message.author.username;
         if (message.member.nickname !== null) {
-          author = message.member.nickname
-        }
-        else {
-          author = message.author.username
+          author = message.member.nickname;
         }
 
-        let xLinkIdx = message.content.indexOf("x.com")
-        let before = message.content.slice(0, xLinkIdx)
-        let after = message.content.slice(xLinkIdx+5)
+        let xLinkIdx = message.content.indexOf("x.com");
+        let before = message.content.slice(0, xLinkIdx);
+        let after = message.content.slice(xLinkIdx+5);
         let result = "**" +
-                    author +
-                    " sent the following X post:**\n" +
-                    before +
-                    "fixvx.com" + 
-                    after;
+                     author +
+                     " sent the following X post:**\n" +
+                     before +
+                     "fixvx.com" + 
+                     after;
 
-        await message.channel.send(result)
-        await message.delete()
+        await message.channel.send(result);
+        await message.delete();
       }
     }
     
