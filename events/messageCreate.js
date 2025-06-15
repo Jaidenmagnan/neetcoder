@@ -17,21 +17,22 @@ module.exports = {
           author = message.member.nickname;
         }
 
-        let xLinkIdx = message.content.indexOf("x.com");
-        let before = message.content.slice(0, xLinkIdx);
-        let after = message.content.slice(xLinkIdx+5);
+        let linkIdx = message.content.indexOf("x.com");
+        let leading = message.content.slice(0, linkIdx);
+        let trailing = message.content.slice(linkIdx+5);
+
         let result = "**" +
                      author +
-                     " sent the following X post:**\n" +
-                     before +
+                     " shared a tweet:**\n" +
+                     leading +
                      "fixvx.com" + 
-                     after;
+                     trailing;
 
         await message.channel.send(result);
         await message.delete();
       }
     }
-    
+        
     if (message.content == "<@1373490238277550202> reload") {
       // check message author
       const { loadCommands, loadEvents } = require("../index.js");
