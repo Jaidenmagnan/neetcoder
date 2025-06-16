@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('query')
                 .setDescription('what to search for')
-                .setRequired('true')
+                .setRequired(true)
         ),
 
     async execute(interaction) {

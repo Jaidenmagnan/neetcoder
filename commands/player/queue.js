@@ -3,7 +3,7 @@ const { useMainPlayer } = require('discord-player');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('shows current queue')
+        .setName('queue')
         .setDescription('with the bot'),
 
     async execute(interaction) {
