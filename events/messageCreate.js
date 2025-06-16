@@ -43,26 +43,6 @@ module.exports = {
             } else {
                 await message.reply("You can't run this command");
             }
-        } else if (
-            message.mentions.everyone ||
-            message.content == "<@1373490238277550202> story"
-        ) {
-            try {
-                const madLibsStory = generateMadLibs(message.author.id);
-                if (madLibsStory && madLibsStory.trim() !== "") {
-                    await message.channel.send(madLibsStory);
-                } else {
-                    console.error("Empty story generated");
-                    await message.channel.send(
-                        "Oops! The story generator had a brain fart. Please try again!"
-                    );
-                }
-      } catch (error) {
-        console.error("Error in message handler:", error);
-        await message.channel.send(
-          "Oops! Something went wrong. Please try again!"
-        );
-      }
     } else if (message.content.trim() == "<@1373490238277550202>") {
       if (message.author == "736025260800868423") {
         await message.reply("Can u leave me alone ur actually weird...");
