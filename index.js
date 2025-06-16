@@ -2,6 +2,8 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const { createServer } = require('./webserver');
+const { create } = require('node:domain');
 require('dotenv').config();
 
 const client = new Client({
@@ -69,3 +71,6 @@ module.exports = { loadCommands, loadEvents };
 
 // Log in to Discord with your client's token
 client.login(process.env.TOKEN);
+
+const { app, server } = createServer(client);
+
