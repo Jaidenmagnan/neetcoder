@@ -104,6 +104,10 @@ Follow these steps to set up and run the neetcoder bot locally for development o
 *   **Vote Timeout:** Default parameters for vote timeouts are managed internally but initiated via the `/votetimeout` command.
 *   **Reaction Roles:** Set up using `/reactionroleadd` and removed with `/reactionroleremove`.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Jaidenmagnan/neetcoder&type=Date)](https://www.star-history.com/#Jaidenmagnan/neetcoder&Date)
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
