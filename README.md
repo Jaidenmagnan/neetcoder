@@ -10,7 +10,6 @@
         *   `/madlibs`: Generate hilarious and random Mad Libs stories.
         *   `/searchbook <title>`: Look up book information using the Google Books API.
         *   `/votetimeout <user> <numvotes> <minutes>`: Initiate a vote among server members to temporarily timeout a user.
-        *   `/waifu`: Get a random (SFW) anime waifu image.
     *   **Utility Commands:**
         *   `/init_welcome <channel>`: Configure a specific channel for welcome and goodbye messages.
         *   `/leaderboard`: View the server's top users based on their "aura" (XP level).
