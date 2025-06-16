@@ -1,5 +1,6 @@
 // Require the necessary discord.js classes
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const { Player, QueryType } = require('discord-player');
 const fs = require('node:fs');
 const path = require('node:path');
 require('dotenv').config();
@@ -11,6 +12,7 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates,
     ],
     partials: [
         Partials.Message,
@@ -18,6 +20,8 @@ const client = new Client({
         Partials.Reaction,
     ],
 });
+
+const player = new Player(client);
 
 function loadCommands() {
     client.commands = new Collection();
@@ -43,14 +47,28 @@ function loadCommands() {
     }
 }
 
-// message listener for reloading
-
+// reload events for client
 function loadEvents() {
-    const eventsPath = path.join(__dirname, 'events');
-    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+    const clientPath = path.join(__dirname, 'events/client');
+    const clientFiles = fs.readdirSync(clientPath).filter(file => file.endsWith('.js'));
 
-    for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, file);
+    for (const file of clientFiles) {
+        const filePath = path.join(clientPath, file);
+        delete require.cache[require.resolve(filePath)];
+        const event = require(filePath);
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+        }
+        else {
+            client.on(event.name, (...args) => event.execute(...args));
+        }
+    }
+
+    const playerPath = path.join(__dirname, 'events/player');
+    const playerFiles = fs.readdirSync(playerPath).filter(file => file.endsWith('.js'));
+
+    for (const file of playerFiles) {
+        const filePath = path.join(playerPath, file);
         delete require.cache[require.resolve(filePath)];
         const event = require(filePath);
         if (event.once) {
@@ -61,6 +79,8 @@ function loadEvents() {
         }
     }
 }
+
+// reload events for player
 
 loadCommands();
 loadEvents();
