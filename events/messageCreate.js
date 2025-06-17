@@ -26,7 +26,7 @@ module.exports = {
                     const repliedMsg = await message.channel.messages.fetch(message.reference.messageId);
                     await repliedMsg.reply(result);
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
             } else {
                 await message.channel.send(result);
