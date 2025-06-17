@@ -26,6 +26,7 @@
     *   **Reaction Roles:** Assigns or removes roles automatically when users add or remove reactions to configured messages.
     *   **Automatic Mad Libs:** Generates a Mad Libs story when `@everyone` is pinged or the bot is mentioned with the word "story".
     *   **Dynamic Reloading:** Admins can reload bot commands and events without a full restart using a specific chat command.
+    *   **Twitter Link Fixer:** Automatically fixes messages that contain a link to x.com for improved content embedding.
 *   **📊 Database Integration:**
     *   Utilizes PostgreSQL with Sequelize ORM for persistent data storage, including:
         *   User levels and message counts.
