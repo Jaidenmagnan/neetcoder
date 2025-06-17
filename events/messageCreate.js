@@ -21,7 +21,16 @@ module.exports = {
                         " shared a tweet:**\n" +
                         msg;
         
-            await message.channel.send(result);
+            if (message.reference && message.reference.messageId) {
+                try {
+                    const repliedMsg = await message.channel.messages.fetch(message.reference.messageId);
+                    await repliedMsg.reply(result);
+                } catch (error) {
+                    console.log(error)
+                }
+            } else {
+                await message.channel.send(result);
+            }
             await message.delete();
         }
         
