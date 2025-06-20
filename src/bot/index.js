@@ -2,9 +2,24 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { createServer } = require('../server/webserver');
 const { create } = require('node:domain');
 require('dotenv').config();
+const express = require('express'); // Add this at the top
+
+function createHealthCheckpoint() {
+    const app = express();
+    const PORT = process.env.BOT_HEALTH_PORT || 4000;
+
+    app.get('/health', (req, res) => {
+        res.status(200).json({ status: 'ok' });
+    });
+
+    app.listen(PORT, () => {
+        console.log(`Bot health-check running on port ${PORT}`);
+    });
+
+    return {app}
+}
 
 const client = new Client({
     intents: [
@@ -72,5 +87,6 @@ module.exports = { loadCommands, loadEvents };
 // Log in to Discord with your client's token
 client.login(process.env.TOKEN);
 
-const { app, server } = createServer(client);
+createHealthCheckpoint();
+
 

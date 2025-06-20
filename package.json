@@ -8,7 +8,9 @@
     "eslint": "^9.27.0"
   },
   "scripts": {
-    "start": "node src/bot/index.js",
+    "start:bot": "node src/bot/index.js",
+    "start:server": "node src/server/server.js",
+    "start": "concurrently \"npm run start:bot\" \"npm run start:server\"",
     "deploy-commands": "node deploy-commands.js",
     "dev": "node src/bot/index.js --watch",
     "lint": "eslint . --ext .js,.ts"
@@ -19,6 +21,7 @@
   "dependencies": {
     "@balldontlie/sdk": "^1.2.2",
     "@napi-rs/canvas": "^0.1.70",
+    "concurrently": "^9.1.2",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

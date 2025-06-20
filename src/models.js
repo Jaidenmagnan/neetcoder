@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const { defaultValueSchemable } = require('sequelize/lib/utils');
 require('dotenv').config();
 
 const sequelize = process.env.DATABASE_URL 
