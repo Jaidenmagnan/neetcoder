@@ -1,13 +1,37 @@
 const express = require('express');
+const http = require('http'); 
 require('dotenv').config();
 
 
-function createServer(client) {
+async function isBotOnline() {
+    const BOT_HEALTH_PORT = process.env.BOT_HEALTH_PORT || 4000;
+    const options = {
+        hostname: 'localhost',
+        port: BOT_HEALTH_PORT,
+        path: '/health',
+        method: 'GET',
+        timeout: 1000,
+    };
+
+    return new Promise((resolve) => {
+        const req = http.request(options, (res) => {
+            resolve(res.statusCode === 200);
+        });
+        req.on('error', () => resolve(false));
+        req.on('timeout', () => {
+            req.destroy();
+            resolve(false);
+        });
+        req.end();
+    });
+}
+
+function createServer() {
     const app = express();
     const PORT = process.env.PORT || 3000;
 
-    app.get('/', (req, res) => {
-        const isOnline = true; 
+    app.get('/', async (req, res) => {
+        const isOnline = await isBotOnline(); 
         const barColor = isOnline ? '#4CAF50' : '#FF6F6F'; // darker green or red
         const statusText = isOnline ? 'Online' : 'Offline';
         const clientId = process.env.CLIENT_ID;
@@ -110,4 +134,4 @@ function createServer(client) {
     return { app, server };
 }
 
-module.exports = { createServer };
+const { app, server } = createServer();
