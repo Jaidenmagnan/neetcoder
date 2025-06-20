@@ -1,5 +1,5 @@
 const { Events, MessageFlags, EmbedBuilder } = require('discord.js');
-const { Votes, Configurations } = require('../models.js');
+const { Votes, Configurations } = require('../../models.js');
 
 module.exports = {
     name: Events.InteractionCreate,

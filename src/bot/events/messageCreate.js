@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { Users } = require("../models.js");
+const { Users } = require("../../models.js");
 const { generateMadLibs } = require("../commands/fun/madlibs.js");
 
 module.exports = {
@@ -36,7 +36,7 @@ module.exports = {
         
         if (message.content == "<@1373490238277550202> reload") {
             // check message author
-            const { loadCommands, loadEvents } = require("../index.js");
+            const { loadCommands, loadEvents } = require("../../index.js");
             if (
                 message.author == "314903883874828288" ||
                 message.author == "530872774986694656"

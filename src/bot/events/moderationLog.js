@@ -1,5 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const { Configurations } = require('../models');
+const { Configurations } = require('../../models');
 /* TODO: Track bans
 /* TODO: Track role changes 
 /* TODO: Track message deletions 

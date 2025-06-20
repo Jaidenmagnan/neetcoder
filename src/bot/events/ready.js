@@ -1,5 +1,5 @@
 const { Events, ActivityType } = require('discord.js');
-const { Users, Configurations, ReactionRoles, Votes, StravaUsers, RunChannels, Books } = require('../models.js');
+const { Users, Configurations, ReactionRoles, Votes, Books } = require('../../models.js');
 
 module.exports = {
     name: Events.ClientReady,

@@ -1,2 +1,2 @@
-release: node deploy-commands.js
-web: node index.js
+release: npm run deploy-commands
+web: npm run start
