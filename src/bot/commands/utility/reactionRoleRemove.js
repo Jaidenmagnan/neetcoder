@@ -1,29 +1,25 @@
 const { MessageFlags, SlashCommandBuilder } = require('discord.js');
-const { ReactionRoles } = require('../../models.js');
+const { ReactionRoles } = require('../../../models.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('reactionroleadd')
-        .setDescription('Add a reaction role to a message.')
-
+        .setName('reactionroleremove')
+        .setDescription('Remove a reaction role from a message.')
         .addStringOption(option =>
             option.setName('messageid')
-                .setDescription('the message id for the role to be added.')
+                .setDescription('The message id for the role to be removed.')
                 .setRequired(true),
         )
         .addStringOption(option =>
             option.setName('emoji')
                 .setDescription('The emoji for the role')
                 .setRequired(true)
-
         )
         .addRoleOption(option =>
             option.setName('role')
-                .setDescription('the role of which you are reacting to.')
+                .setDescription('The role of which you are removing.')
                 .setRequired(true),
         ),
-
-
 
     async execute(interaction) {
         const message_id = interaction.options.getString('messageid');
@@ -33,7 +29,7 @@ module.exports = {
         try {
             const message = await interaction.channel.messages.fetch(message_id);
 
-            let reaction_role = await ReactionRoles.findOne({
+            const reaction_role = await ReactionRoles.findOne({
                 where: {
                     messageid: message_id,
                     guildid: interaction.guild.id,
@@ -42,41 +38,39 @@ module.exports = {
                 },
             });
 
-            if (!reaction_role) {
-                reaction_role = await ReactionRoles.create({ 
-                    messageid: message_id,
-                    guildid: interaction.guild.id,
-                    roleid: role_id,
-                    emoji: emoji,
-                });
+            if (reaction_role) {
+                await reaction_role.destroy();
 
-                await message.react(emoji);
+                const reaction = message.reactions.cache.get(emoji) ||
+                    message.reactions.cache.find(r => r.emoji.toString() === emoji);
+                if (reaction) {
+                    await reaction.users.remove(interaction.client.user);
+                }
+
                 await interaction.reply({
-                    content: 'reaction role added',
+                    content: 'reaction role removed',
                     flags: MessageFlags.Ephemeral,
                 });
             }
             else {
                 await interaction.reply({
-                    content: 'reaction role already added',
+                    content: 'no reaction role found',
                     flags: MessageFlags.Ephemeral,
                 });
             }
+
         }
         catch (error) {
-            if (error === 10014) {
+            if (error.code === 10014) {
                 await interaction.reply({
                     content: 'emoji not found',
                     flags: MessageFlags.Ephemeral,
                 });
             }
-            else {
-                await interaction.reply({
-                    content: 'issues adding reactions',
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
-
+            await interaction.reply({
+                content: 'issue removing reaction role',
+                flags: MessageFlags.Ephemeral,
+            });
         }
-    }
-}
+    },
+};

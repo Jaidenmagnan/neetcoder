@@ -17,7 +17,7 @@ function createServer(client) {
             <head>
                 <title>Neetcoder</title>
                 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
-                <link rel="icon" type="image/jpeg" href="/assets/icon.jpg">
+                <link rel="icon" type="image/jpeg" href="../assets/icon.jpg">
                 <style>
                 body {
                     font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
@@ -101,7 +101,7 @@ function createServer(client) {
         `);
     });
 
-    app.use('/assets', express.static('assets'));
+    app.use('/assets', express.static('src/assets'));
 
     const server = app.listen(PORT, () => {
         console.log(`Web server running on port ${PORT}`);

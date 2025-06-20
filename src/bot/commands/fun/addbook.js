@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, MessageFlags } = require('discord.js');
-const { Books } = require('../../models.js');
+const { Books } = require('../../../models.js');
 
 module.exports = {
   data: new SlashCommandBuilder()

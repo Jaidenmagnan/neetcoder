@@ -2,7 +2,7 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { createServer } = require('./webserver');
+const { createServer } = require('../server/webserver');
 const { create } = require('node:domain');
 require('dotenv').config();
 

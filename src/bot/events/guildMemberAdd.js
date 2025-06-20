@@ -1,5 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const { Configurations } = require('../models.js');
+const { Configurations } = require('../../models.js');
 
 module.exports = {
     name: Events.GuildMemberAdd,

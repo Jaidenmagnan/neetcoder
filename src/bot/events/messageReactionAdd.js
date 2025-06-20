@@ -1,8 +1,8 @@
 const { Events } = require('discord.js');
-const { ReactionRoles } = require('../models.js');
+const { ReactionRoles } = require('../../models.js');
 
 module.exports = {
-    name: Events.MessageReactionRemove,
+    name: Events.MessageReactionAdd,
     async execute(reaction, user) {
         if (user.bot) return;
 
@@ -28,8 +28,8 @@ module.exports = {
                 const role = reaction.message.guild.roles.cache.get(reactionRole.roleid);
 
                 if (role && member) {
-                    await member.roles.remove(role);
-                    console.log(`Removed role ${role.name} from ${user.tag}`);
+                    await member.roles.add(role);
+                    console.log(`Added role ${role.name} to ${user.tag}`);
                 }
             }
             catch {
