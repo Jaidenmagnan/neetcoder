@@ -8,13 +8,12 @@
     "eslint": "^9.27.0"
   },
   "scripts": {
-    "start:react-build" : "cd src/client && npm run build",
     "start:bot": "node src/bot/index.js",
     "start:server": "node src/server/server.js",
-    "start": "concurrently \"npm run start:bot\" \"npm run start:server\"",
+    "start": "npm run heroku-postbuild && concurrently \"npm run start:bot\" \"npm run start:server\"",
     "deploy-commands": "node deploy-commands.js",
     "dev": "node src/bot/index.js --watch",
-    "heroku-postbuild": "cd src/client && npm install && npm run build",
+    "heroku-postbuild": "cd src/client && npm install",
     "lint": "eslint . --ext .js,.ts"
   },
   "peerDependencies": {
