@@ -87,13 +87,13 @@ Follow these steps to set up and run the neetcoder bot locally for development o
 6.  **Deploy Slash Commands:**
     Before starting the bot, deploy the slash commands to your test guild. Ensure `NODE_ENV` is set to `development` in your `.env` file.
     ```bash
-    node deploy-commands.js
+    npm run deploy-commands
     ```
     If `NODE_ENV` is `production`, commands will be deployed globally.
 
 7.  **Run the Bot:**
     ```bash
-    node index.js
+    npm run dev
     ```
     Your bot should now be online and connected to your Discord server.
     
