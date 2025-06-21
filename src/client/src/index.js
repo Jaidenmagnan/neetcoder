@@ -14,7 +14,6 @@ root.render(
     <Routes>
       <Route path="/" element={<App />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/api/sign-in" element={<SignInPage />} />
     </Routes>
     </BrowserRouter>
   </React.StrictMode>

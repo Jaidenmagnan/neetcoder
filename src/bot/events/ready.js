@@ -1,5 +1,5 @@
 const { Events, ActivityType } = require('discord.js');
-const { Users, Configurations, ReactionRoles, Votes, Books } = require('../../models.js');
+const { Users, Configurations, ReactionRoles, Votes, Books, UserAuth } = require('../../models.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -8,6 +8,7 @@ module.exports = {
         Users.sync({ alter: true });
         Configurations.sync({ alter: true });
         ReactionRoles.sync({ alter: true });
+        UserAuth.sync({ alter: true });
         Votes.sync();
         Books.sync();
 	
