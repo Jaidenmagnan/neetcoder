@@ -1,4 +1,4 @@
-import BotStatus from './components/BotStatus';
+import BotStatus from '../components/BotStatus';
 
 function App() {
   return <BotStatus />
