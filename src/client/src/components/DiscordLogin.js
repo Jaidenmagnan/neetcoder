@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function DiscordLogin() {
   const [user, setUser] = useState(null);
 
   async function getMe() {
     try {
-      const response = await fetch("/api/user/me", {
-        credentials: "include",
+      const response = await axios.get("/api/user/me", {
+        withCredentials: true,
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          setUser(null);
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUser(data);
+      setUser(response.data);
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setUser(null);
+        return;
+      }
       console.error("Failed to fetch user:", error);
       setUser(null);
     }
@@ -54,7 +50,7 @@ export default function DiscordLogin() {
         <div id="info" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <a
             id="sign-out"
-            href="http://localhost:3000/auth/sign-out"
+            href={`${process.env.REACT_APP_SERVER_BASE_URL}/auth/sign-out`}
             style={{
               marginRight: 8,
               textDecoration: "none",
@@ -74,7 +70,7 @@ export default function DiscordLogin() {
       ) : (
         <a
           id="sign-in"
-          href="https://discord.com/oauth2/authorize?client_id=1373490238277550202&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fsign-in&scope=identify+guilds+email"
+          href={`${process.env.REACT_APP_OAUTH_URL}`}
           style={{
               marginRight: 8,
               textDecoration: "none",

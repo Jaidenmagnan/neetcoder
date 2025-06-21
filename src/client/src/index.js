@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './pages/App';
-import Dashboard from './pages/Dashboard';
-import SignInPage from './pages/SignInPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route  } from 'react-router-dom';
 
@@ -13,7 +11,6 @@ root.render(
     <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -72,7 +72,7 @@ function createServer() {
             client_secret: clientSecret,
             code,
             grant_type: "authorization_code",
-            redirect_uri: "http://localhost:3000/auth/sign-in",
+            redirect_uri: `${process.env.DISCORD_REDIRECT_URL}`,
             scope: "identify",
           }).toString(),
           {
@@ -118,10 +118,6 @@ function createServer() {
         console.error(error);
       }
     }
-  });
-
-  app.get("/test", (req, res) => {
-    res.send("test");
   });
 
   if (process.env.NODE_ENV === "production") {
