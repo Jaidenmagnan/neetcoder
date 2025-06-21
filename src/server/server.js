@@ -51,6 +51,11 @@ function createServer() {
     res.json(req.user);
   });
 
+  app.get("/auth/sign-out", (req, res) => {
+    res.clearCookie("token");
+    res.redirect(process.env.CLIENT_REDIRECT_URL);
+  });
+
   app.get("/auth/sign-in", async ({ query }, response) => {
     const clientId = process.env.CLIENT_ID;
     const clientSecret = process.env.CLIENT_SECRET;

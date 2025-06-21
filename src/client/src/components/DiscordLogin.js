@@ -32,14 +32,39 @@ export default function DiscordLogin() {
   const getAvatarUrl = (user) => {
     if (!user || !user.avatar) return null;
     const url = `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`;
-    console.log("Avatar URL:", url);
     return url;
   };
 
   return (
-    <div>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        right: 0,
+        width: "auto",
+        height: "auto",
+        display: "flex",
+        justifyContent: "flex-end",
+        alignItems: "flex-start",
+        zIndex: 9999,
+        padding: 16,
+      }}
+    >
       {user ? (
-        <div id="info">
+        <div id="info" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <a
+            id="sign-out"
+            href="http://localhost:3000/auth/sign-out"
+            style={{
+              marginRight: 8,
+              textDecoration: "none",
+              color: "#9caf88",
+              fontFamily: "'Luckiest Guy', cursive, sans-serif",
+              fontWeight: "bold",
+            }}
+          >
+            Sign Out
+          </a>
           <img
             src={getAvatarUrl(user)}
             alt="avatar"
@@ -48,10 +73,17 @@ export default function DiscordLogin() {
         </div>
       ) : (
         <a
-          id="login"
+          id="sign-in"
           href="https://discord.com/oauth2/authorize?client_id=1373490238277550202&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fsign-in&scope=identify+guilds+email"
+          style={{
+              marginRight: 8,
+              textDecoration: "none",
+              color: "#9caf88",
+              fontFamily: "'Luckiest Guy', cursive, sans-serif",
+              fontWeight: "bold",
+            }}
         >
-          Identify Yourself
+         Sign In 
         </a>
       )}
     </div>
