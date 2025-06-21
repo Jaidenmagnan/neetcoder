@@ -31,9 +31,11 @@ function createServer() {
     const app = express();
     const PORT = process.env.PORT || 3000;
 
-    const buildPath = path.join(__dirname, '../client/build');
+    if (process.env.NODE_ENV === 'production') {
+        const buildPath = path.join(__dirname, '../client/build');
+        app.use(express.static(buildPath));
+    }
 
-    app.use(express.static(buildPath));
 
     app.get('/api/bot-status', async (_, res) => {
         const isOnline = await isBotOnline();
@@ -45,9 +47,11 @@ function createServer() {
         });
     });
 
-    app.get('/{*any}', (_, res) => {
-        res.sendFile(path.resolve(buildPath, 'index.html'));
-    });
+    if (process.env.NODE_ENV === 'production') {
+        app.get('/{*any}', (_, res) => {
+            res.sendFile(path.resolve(buildPath, 'index.html'));
+        });
+    }
 
     const server = app.listen(PORT, () => {
         console.log(`Web server running on port ${PORT}`);

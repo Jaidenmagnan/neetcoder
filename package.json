@@ -10,9 +10,10 @@
   "scripts": {
     "start:bot": "node src/bot/index.js",
     "start:server": "node src/server/server.js",
+    "start:client": "cd src/client && npm start",
     "start": "npm run heroku-postbuild && concurrently \"npm run start:bot\" \"npm run start:server\"",
     "deploy-commands": "node deploy-commands.js",
-    "dev": "node src/bot/index.js --watch",
+    "dev": "concurrently \"npm run start:bot\" \"npm run start:server\" \"npm run start:client\"",
     "heroku-postbuild": "cd src/client && npm install && npm run build",
     "lint": "eslint . --ext .js,.ts"
   },
