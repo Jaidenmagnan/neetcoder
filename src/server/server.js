@@ -64,7 +64,7 @@ function createServer() {
                         client_secret: clientSecret,
                         code,
                         grant_type: 'authorization_code',
-                        redirect_uri: `http://localhost:${PORT}/api/sign-in`,
+                        redirect_uri: `http://localhost:5000/api/sign-in`,
                         scope: 'identify',
                     }).toString(),
                     headers: {
@@ -87,9 +87,6 @@ function createServer() {
                 console.error(error);
             }
         }
-
-        return response.sendFile('index.html', { root: '.' });
-
     });
 
     if (process.env.NODE_ENV === 'production') {

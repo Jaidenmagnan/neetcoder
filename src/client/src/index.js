@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './pages/App';
 import Dashboard from './pages/Dashboard';
+import SignInPage from './pages/SignInPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route  } from 'react-router-dom';
 
@@ -13,6 +14,7 @@ root.render(
     <Routes>
       <Route path="/" element={<App />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/api/sign-in" element={<SignInPage />} />
     </Routes>
     </BrowserRouter>
   </React.StrictMode>
