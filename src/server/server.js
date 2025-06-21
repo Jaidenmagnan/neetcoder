@@ -1,4 +1,5 @@
 const express = require('express');
+const { request } = require('undici')
 const http = require('http');
 require('dotenv').config();
 const path = require('path');
@@ -45,6 +46,50 @@ function createServer() {
             isOnline,
             discordLink
         });
+    });
+
+    app.get('/api/sign-in', async ({ query }, response) => {
+        const clientId = process.env.CLIENT_ID;
+        const clientSecret = process.env.CLIENT_SECRET;
+        const PORT = process.env.PORT;
+
+        const { code } = query;
+
+        if (code) {
+            try {
+                const tokenResponseData = await request('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        client_id: clientId,
+                        client_secret: clientSecret,
+                        code,
+                        grant_type: 'authorization_code',
+                        redirect_uri: `http://localhost:${PORT}/api/sign-in`,
+                        scope: 'identify',
+                    }).toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+
+                const oauthData = await tokenResponseData.body.json();
+                console.log(oauthData);
+
+                const userResult = await request('https://discord.com/api/users/@me', {
+                    headers: {
+                        authorization: `${oauthData.token_type} ${oauthData.access_token}`,
+                    },
+                });
+                console.log(await userResult.body.json());
+            } catch (error) {
+                // NOTE: An unauthorized token will not throw an error
+                // tokenResponseData.statusCode will be 401
+                console.error(error);
+            }
+        }
+
+        return response.sendFile('index.html', { root: '.' });
+
     });
 
     if (process.env.NODE_ENV === 'production') {
