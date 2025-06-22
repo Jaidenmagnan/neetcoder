@@ -28,7 +28,7 @@ export default function Dashboard() {
         {/* Dropdown Placeholder */}
           <div className="h-12 bg-[#faf7f0] rounded-md shadow flex items-center px-4" style={{ width: '14rem' }}>
           {/* Dropdown will go here */}
-          <span className="text-[#4a4a4a] font-bold">Dropdown</span>
+          <ListGuilds />
         </div>
         {/* Sign Out and Avatar */}
         <div className="flex items-center gap-4" style={{ minWidth: 0 }}>
@@ -50,7 +50,6 @@ export default function Dashboard() {
           className="flex-1 text-[#4a4a4a] bg-[#faf7f0] rounded-md shadow h-full flex flex-col p-4"
           style={{ minWidth: 0, minHeight: 0, overflow: 'hidden' }}
         >
-          <ListGuilds />
         </div>
       </div>
     </div>
