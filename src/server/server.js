@@ -120,46 +120,44 @@ function createServer() {
     }
   });
 
-  app.get("/api/list-bot-guilds", async (req, res) => {
+
+app.get("/api/list-guilds", async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Unauthorized" });
     }
-    const guilds = await Guilds.findAll();
-    console.log(guilds);
-    if (!guilds) {
-        return res.status(404).json({ error: "No guilds found" });
-    }
-    res.json(guilds);
-  });
-
-  app.get("/api/list-user-guilds", async (req, res) => {
-    if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
 
     const user = await UserAuth.findOne({
-      where: { discordId: req.user.discordId },
+        where: { discordId: req.user.discordId },
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: "User not found" });
     }
 
     try {
-      const guildsResponse = await axios.get(
-        `https://discord.com/api/users/@me/guilds`,
-        {
-          headers: {
-            authorization: `${req.token_type} ${req.access_token}`,
-          },
-        }
-      );
-      res.json(guildsResponse.data);
+        const guildsResponse = await axios.get(
+            `https://discord.com/api/users/@me/guilds`,
+            {
+                headers: {
+                    authorization: `${req.token_type} ${req.access_token}`,
+                },
+            }
+        ); 
+        const allGuilds = guildsResponse.data;
+        const botGuilds = await Guilds.findAll();
+        const botGuildIds = botGuilds.map(g => g.guildid);
+
+        const filteredGuilds = allGuilds.filter(guild =>
+            botGuildIds.includes(guild.id)
+        );
+
+        res.json(filteredGuilds);
+        console.log(filteredGuilds);
     } catch (error) {
-      console.error("Error fetching guilds:", error);
-      res.status(500).json({ error: "Failed to fetch guilds" });
+        console.error("Error fetching guilds:", error);
+        res.status(500).json({ error: "Failed to fetch guilds" });
     }
-  });
+});
 
   if (process.env.NODE_ENV === "production") {
     app.get("/{*any}", (_, res) => {

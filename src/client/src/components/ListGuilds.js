@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function ListGuilds() {
     useEffect(() => {
-        axios.get('/api/list-bot-guilds')
+        axios.get('/api/list-guilds')
             .then(res => {
                 console.log(res.data);
             })
