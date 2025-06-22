@@ -1,29 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { getMe } from "../utils/Auth";
 import axios from "axios";
 
 export default function DiscordLogin() {
   const [user, setUser] = useState(null);
 
-  async function getMe() {
-    try {
-      const response = await axios.get("/api/user/me", {
-        withCredentials: true,
-      });
-
-      setUser(response.data);
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setUser(null);
-        return;
-      }
-      console.error("Failed to fetch user:", error);
-      setUser(null);
-    }
-  }
-
   useEffect(() => {
-    getMe();
+    async function fetchUser() {
+      const userData = await getMe();
+      setUser(userData);
+    }
+    fetchUser();
   }, []);
+
 
   const getAvatarUrl = (user) => {
     if (!user || !user.avatar) return null;

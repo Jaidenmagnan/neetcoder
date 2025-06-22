@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './pages/App';
+import ProtectedRoutes from './utils/ProtectedRoutes';
+import Dashboard from './pages/Dashboard';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route  } from 'react-router-dom';
 
@@ -10,7 +12,10 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="/sign-in" element={<App />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/" element={<Dashboard />} />
+      </Route>
     </Routes>
     </BrowserRouter>
   </React.StrictMode>
