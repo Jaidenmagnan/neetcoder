@@ -14,7 +14,7 @@ export default function BotStatus() {
     const statusText = status.isOnline ? 'Online' : 'Offline';
 
     return (
-        <div className="font-luckyguy bg-[#f5e6c8] min-h-screen m-0 p-0">
+        <div className="font-luckyguy min-h-screen m-0 p-0">
             <div className="flex flex-col items-center justify-center min-h-screen">
                 <img
                     src="/assets/snoopy.gif"
