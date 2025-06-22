@@ -32,8 +32,8 @@ function createServer() {
   app.use(cookieParser());
   app.use(authenticate);
 
+  const buildPath = path.join(__dirname, "../client/build");
   if (process.env.NODE_ENV === "production") {
-    const buildPath = path.join(__dirname, "../client/build");
     app.use(express.static(buildPath));
   }
 
