@@ -1,5 +1,6 @@
 const { Events, MessageFlags, EmbedBuilder } = require('discord.js');
 const { Votes, Configurations } = require('../../models.js');
+const { useMainPlayer } = require('discord-player');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -21,7 +22,11 @@ module.exports = {
                 return;
             }
             try {
-                await command.execute(interaction);
+                const player = useMainPlayer();
+                const data = {
+                    guild: interaction.guild
+                };
+                await player.context.provide(data, () => command.execute(interaction));
             }
             catch (error) {
                 console.error(error);

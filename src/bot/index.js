@@ -1,5 +1,7 @@
 // Require the necessary discord.js classes
-const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, Guild } = require('discord.js');
+const { Player } = require('discord-player');
+const { YoutubeiExtractor } = require('discord-player-youtubei');
 const fs = require('node:fs');
 const path = require('node:path');
 const { create } = require('node:domain');
@@ -28,6 +30,7 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates
     ],
     partials: [
         Partials.Message,
@@ -35,6 +38,11 @@ const client = new Client({
         Partials.Reaction,
     ],
 });
+
+const player = new Player(client);
+player.extractors.register(YoutubeiExtractor, {});
+console.log(player.scanDeps);
+player.on('debug', console.log);
 
 function loadCommands() {
     client.commands = new Collection();
