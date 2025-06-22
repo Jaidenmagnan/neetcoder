@@ -32,54 +32,29 @@ export default function DiscordLogin() {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        width: "auto",
-        height: "auto",
-        display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        zIndex: 9999,
-        padding: 16,
-      }}
-    >
+    <div className="fixed top-0 right-0 z-[9999] p-4 flex justify-end items-start">
       {user ? (
-        <div id="info" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div id="info" className="flex items-center gap-2">
           <a
             id="sign-out"
             href={`${process.env.REACT_APP_SERVER_BASE_URL}/auth/sign-out`}
-            style={{
-              marginRight: 8,
-              textDecoration: "none",
-              color: "#9caf88",
-              fontFamily: "'Luckiest Guy', cursive, sans-serif",
-              fontWeight: "bold",
-            }}
+            className="mr-2 no-underline text-[#9caf88] font-bold font-luckyguy"
           >
             Sign Out
           </a>
           <img
             src={getAvatarUrl(user)}
             alt="avatar"
-            style={{ width: 48, height: 48, borderRadius: "50%" }}
+            className="w-12 h-12 rounded-full"
           />
         </div>
       ) : (
         <a
           id="sign-in"
           href={`${process.env.REACT_APP_OAUTH_URL}`}
-          style={{
-              marginRight: 8,
-              textDecoration: "none",
-              color: "#9caf88",
-              fontFamily: "'Luckiest Guy', cursive, sans-serif",
-              fontWeight: "bold",
-            }}
+          className="mr-2 no-underline text-[#9caf88] font-bold font-luckyguy"
         >
-         Sign In 
+          Sign In
         </a>
       )}
     </div>

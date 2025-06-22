@@ -14,74 +14,24 @@ export default function BotStatus() {
     const statusText = status.isOnline ? 'Online' : 'Offline';
 
     return (
-        <div style={{
-            fontFamily: "'Luckiest Guy', cursive, sans-serif",
-            background: '#f5e6c8',
-            minHeight: '100vh',
-            margin: 0,
-            padding: 0
-        }}>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh'
-            }}>
+        <div className="font-luckyguy bg-[#f5e6c8] min-h-screen m-0 p-0">
+            <div className="flex flex-col items-center justify-center min-h-screen">
                 <img
                     src="/assets/snoopy.gif"
                     alt="Snoopy"
-                    style={{
-                        width: 120,
-                        marginBottom: 10,
-                        zIndex: 2,
-                        position: 'relative'
-                    }}
+                    className="w-[120px] mb-2.5 relative z-20"
                 />
-                <div style={{
-                    width: 350,
-                    height: 60,
-                    background: barColor,
-                    borderRadius: 30,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '2rem',
-                    fontFamily: "'Luckiest Guy', cursive, sans-serif",
-                    color: '#fff',
-                    border: '4px solid #e0c097',
-                    marginBottom: 30,
-                    marginTop: 0,
-                    position: 'relative'
-                }}>
+                <div
+                    className={`w-[350px] h-[60px] rounded-[30px] shadow-lg flex items-center justify-center text-2xl font-luckyguy text-white border-4 border-[#e0c097] mb-7 mt-0 relative`}
+                    style={{ background: barColor }}
+                >
                     {statusText}
                 </div>
             </div>
-            <div style={{
-                position: 'fixed',
-                left: 0,
-                right: 0,
-                bottom: 40,
-                display: 'flex',
-                justifyContent: 'center',
-                zIndex: 10
-            }}>
+            <div className="fixed left-0 right-0 bottom-10 flex justify-center z-10">
                 <a href={status.discordLink} target="_blank" rel="noopener noreferrer">
-                    <button style={{
-                        background: '#9CAF88',
-                        fontFamily: "'Luckiest Guy', cursive, sans-serif",
-                        color: 'white',
-                        fontSize: '1.3rem',
-                        border: '3px solid #e0c097',
-                        borderRadius: 25,
-                        padding: '16px 38px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s, transform 0.2s'
-                    }}
-                    onMouseOver={e => e.currentTarget.style.background = '#8A9C7A'}
-                    onMouseOut={e => e.currentTarget.style.background = '#9CAF88'}
+                    <button
+                        className="bg-[#9CAF88] font-luckyguy text-white text-[1.3rem] border-[3px] border-[#e0c097] rounded-[25px] px-10 py-4 shadow-md cursor-pointer transition duration-200 hover:bg-[#8A9C7A] active:scale-95"
                     >
                         Add to Server
                     </button>
@@ -90,4 +40,3 @@ export default function BotStatus() {
         </div>
     );
 }
-
