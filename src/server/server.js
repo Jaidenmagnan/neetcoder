@@ -1,5 +1,5 @@
 const express = require("express");
-const { UserAuth } = require("../models.js");
+const { UserAuth, Guilds } = require("../models.js");
 const axios = require("axios");
 require("dotenv").config();
 const path = require("path");
@@ -108,7 +108,7 @@ function createServer() {
             });
         }
 
-        const token = await sign({ sub: id }, process.env.JWT_SECRET, {
+        const token = await sign({ sub: id , token_type: oauthData.token_type, access_token: oauthData.access_token}, process.env.JWT_SECRET, {
           expiresIn: "1h",
         });
 
@@ -117,6 +117,47 @@ function createServer() {
       } catch (error) {
         console.error(error);
       }
+    }
+  });
+
+  app.get("/api/list-bot-guilds", async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    const guilds = await Guilds.findAll();
+    console.log(guilds);
+    if (!guilds) {
+        return res.status(404).json({ error: "No guilds found" });
+    }
+    res.json(guilds);
+  });
+
+  app.get("/api/list-user-guilds", async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await UserAuth.findOne({
+      where: { discordId: req.user.discordId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    try {
+      const guildsResponse = await axios.get(
+        `https://discord.com/api/users/@me/guilds`,
+        {
+          headers: {
+            authorization: `${req.token_type} ${req.access_token}`,
+          },
+        }
+      );
+      res.json(guildsResponse.data);
+    } catch (error) {
+      console.error("Error fetching guilds:", error);
+      res.status(500).json({ error: "Failed to fetch guilds" });
     }
   });
 

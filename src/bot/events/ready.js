@@ -1,16 +1,32 @@
 const { Events, ActivityType } = require('discord.js');
-const { Users, Configurations, ReactionRoles, Votes, Books, UserAuth } = require('../../models.js');
+const { Guilds, Users, Configurations, ReactionRoles, Votes, Books, UserAuth } = require('../../models.js');
 
 module.exports = {
     name: Events.ClientReady,
     once: true,
-    execute(client) {
-        Users.sync({ alter: true });
-        Configurations.sync({ alter: true });
-        ReactionRoles.sync({ alter: true });
-        UserAuth.sync({ alter: true });
-        Votes.sync();
-        Books.sync();
+    async execute(client) {
+        await Users.sync({ alter: true });
+        await Configurations.sync({ alter: true });
+        await ReactionRoles.sync({ alter: true });
+        await UserAuth.sync({ alter: true });
+        await Votes.sync();
+        await Books.sync();
+        await Guilds.sync({ alter: true });
+
+        console.log('Database synced successfully.');
+
+        client.guilds.cache.forEach(async guild => {
+            const existingGuild = await Guilds.findOne({ where: { guildid: guild.id } });
+            if (!existingGuild) {
+                await Guilds.create({
+                    guildid: guild.id,
+                    guildname: guild.name,
+                    guildicon: guild.icon
+                });
+                console.log(`Guild ${guild.name} (${guild.id}) added to the database.`);
+            }
+        })
+
 	
 	client.user.setPresence({
 		activities: [{

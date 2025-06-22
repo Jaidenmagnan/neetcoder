@@ -76,6 +76,27 @@ const UserAuth = sequelize.define('user_auth', {
     },
   });
 
+const Guilds = sequelize.define('guilds', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    guildid: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    guildname: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    guildicon: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      defaultValue: '',
+    }
+  });
+
 const Configurations = sequelize.define('configurations', {
       id: {
         type: Sequelize.INTEGER,
@@ -187,4 +208,4 @@ const Books = sequelize.define('books', {
   },
 });
 
-module.exports = { UserAuth, Users, Sequelize, Configurations, ReactionRoles, Votes, Books };
+module.exports = { Guilds, UserAuth, Users, Sequelize, Configurations, ReactionRoles, Votes, Books };
