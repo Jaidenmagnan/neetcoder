@@ -19,10 +19,15 @@ import MainContent from '../components/MainContent';
 
 export default function Dashboard() {
     const [selectedGuild, setSelectedGuild] = useState(null);
+    const [selectedFeature, setSelectedFeature] = useState(null);
 
     const handleSelectGuild = (guild) => {
         setSelectedGuild(guild);
     };
+
+    const handleSelectFeature = (feature) => {
+        setSelectedFeature(feature);
+    }
 
     return (
         <div
@@ -54,14 +59,15 @@ export default function Dashboard() {
                     style={{ minHeight: 0 }}
                 >
                     {/* Put your sidebar content here */}
-                    <FeatureList />
+                    <FeatureList selectedFeature={selectedFeature} onSelectFeature={handleSelectFeature} />
                 </div>
                 {/* Main Panel */}
                 <div
                     className="flex-1 text-[#4a4a4a] bg-[#faf7f0] rounded-md shadow h-full flex flex-col p-4"
                     style={{ minWidth: 0, minHeight: 0, overflow: 'hidden' }}
                 >
-                            <MainContent guild={selectedGuild} feature={"hi"} />
+                    {/* "neetcoder" text on top left of the main panel */}
+                    <MainContent guild={selectedGuild} feature={selectedFeature} />
                 </div>
             </div>
         </div>
