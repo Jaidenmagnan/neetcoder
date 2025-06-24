@@ -9,19 +9,12 @@ export default function Leaderboard({ guildId }) {
         setLoading(true);
         axios.get('/api/leaderboard' + '?guildId=' + guildId)
             .then(response => {
-                // Sort by message_count descending
-                const sortedData = [...response.data].sort((a, b) => b.message_count - a.message_count);
-                setLeaderboardData(sortedData);
+                // Filter out null users
+                const filteredData = response.data.filter(user => user.profile.userName != null);
+                setLeaderboardData(filteredData);
             })
             .finally(() => setLoading(false));
     }, [guildId]);
-
-    // Log each user in the leaderboardData
-    useEffect(() => {
-        leaderboardData.forEach(user => {
-            console.log(user);
-        });
-    }, [leaderboardData]);
     return (
         <div className="flex flex-col items-center justify-center h-full w-full font-luckyguy">
             <h1 className="text-4xl font-bold mb-4">Leaderboard</h1>

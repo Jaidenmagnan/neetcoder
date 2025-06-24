@@ -179,6 +179,7 @@ function createServer() {
     try {
       const leaderboard = await Users.findAll({
         where: { guildid: guildId },
+        order: [["message_count", "DESC"]],
         limit: 50,
       });
 
