@@ -1,5 +1,5 @@
 export default function FeatureList({ selectedFeature, onSelectFeature }) {
-    const features = ["Configuration Logs", "Role Groups", "Feature Flags"];
+    const features = ["Leaderboard", "Configuration Logs", "Role Groups", "Feature Flags"];
 
     return (
         <div className="flex flex-col items-center justify-top h-full w-full">
