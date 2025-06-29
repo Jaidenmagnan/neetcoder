@@ -48,7 +48,7 @@ module.exports = {
         	.setTitle(`${groupName}`);
     
     	if (message) {
-        	embed.setDescription(message);
+        	embed.setDescription(`**${message}**`);
     	}
     
     	let rolesText = '';
@@ -62,13 +62,13 @@ module.exports = {
                     emoji = `<:custom:${emoji}>`;
                 }
 
-                rolesText += `${emoji} - ${discordRole.name}\n`;
+                rolesText += `${emoji}   **${discordRole.name}**\n`;
             }
         }
     
     	if (rolesText) {
         	embed.addFields({
-				name: 'Roles:',
+				name: `**Roles:**`,
             	value: rolesText,
             	inline: false
         	});
