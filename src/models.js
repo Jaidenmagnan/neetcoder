@@ -164,17 +164,18 @@ const Votes = sequelize.define('votes', {
     },
 });
 
-const ReactionRoles = sequelize.define('reaction_roles', {
+// these roles are assigned to a GROUP
+const Roles = sequelize.define('roles', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    messageid: {
+    roleGroupId: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    guildid: {
+    guildId: {
       type: Sequelize.STRING,
       allowNull: false,
     },
@@ -182,11 +183,32 @@ const ReactionRoles = sequelize.define('reaction_roles', {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    roleid: {
+    roleId: {
       type: Sequelize.STRING,
       allowNull: false,
     },
 });
+
+const RoleGroups = sequelize.define('role_groups', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true,
+	},
+	name: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	guildId: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	messageId: {
+		type: Sequelize.STRING,
+		allowNull: true
+	},
+})
+
 const Books = sequelize.define('books', {
   id: {
     type: Sequelize.INTEGER,
@@ -208,4 +230,4 @@ const Books = sequelize.define('books', {
   },
 });
 
-module.exports = { Guilds, UserAuth, Users, Sequelize, Configurations, ReactionRoles, Votes, Books };
+module.exports = { Guilds, UserAuth, Users, Sequelize, Configurations, Roles, RoleGroups, Votes, Books };

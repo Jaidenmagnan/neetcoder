@@ -1,10 +1,25 @@
 const { MessageFlags, SlashCommandBuilder } = require('discord.js');
 const { Roles, RoleGroups } = require('../../../models.js');
 
+
+function isEmoji(str) {
+    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)+$/u;
+    return emojiRegex.test(str.trim());
+}
+
+function extractDiscordEmojiId(emojiString) {
+	if(isEmoji(emojiString)) {
+		return emojiString;
+	}
+
+   	const match = emojiString.match(/<a?:\w+:(\d+)>/); 
+	return match ? match[1] : null;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('rolegroupadd')
-        .setDescription('Add a reaction role to a message.')
+        .setDescription('Adds a role to a group')
 
         .addStringOption(option =>
             option.setName('groupname')
@@ -28,15 +43,17 @@ module.exports = {
     async execute(interaction) {
         const groupName = interaction.options.getString('groupname');
         const roleId = interaction.options.getRole('role').id;
-        const emoji = interaction.options.getString('emoji');
+        const emoji = extractDiscordEmojiId(interaction.options.getString('emoji'));
+		console.log(emoji);
 
         try {
-			const doesEmojiExist = !!client.emojis.cache.get(emoji);
+			const doesEmojiExist = !!(interaction.guild.emojis.cache.get(emoji) || isEmoji(emoji));
 			if (!doesEmojiExist) {
 				await interaction.reply({
 					content: "The emoji does not exist!",
 					flags:MessageFlags.Ephemeral,
 				})
+				return;
 			}
 
             let roleGroup = await RoleGroups.findOne({
@@ -54,14 +71,13 @@ module.exports = {
 				return;
             }
 
-
-
 			let _ = await Roles.create({
 				roleGroupId: roleGroup.id,
 				roleId: roleId,
 				guildId: interaction.guild.id,
 				emoji: emoji,
 			})
+
 			await interaction.reply({
 				content: "role added to group: " + groupName,
 				flags: MessageFlags.Ephemeral,
@@ -69,7 +85,7 @@ module.exports = {
         }
         catch (error) {
             await interaction.reply({
-                content: 'issue adding to group',
+                content: 'issue adding to group' + error,
                 flags: MessageFlags.Ephemeral,
             });
         }
