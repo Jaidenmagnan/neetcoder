@@ -7,8 +7,8 @@ module.exports = {
     async execute(client) {
         await Users.sync({ alter: true });
         await Configurations.sync({ alter: true });
-        await Roles.sync({ force: true });
-		await RoleGroups.sync({ force: true });
+        await Roles.sync({ alter: true });
+		await RoleGroups.sync({ alter: true });
         await UserAuth.sync({ alter: true });
         await Votes.sync();
         await Books.sync();

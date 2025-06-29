@@ -172,7 +172,7 @@ const Roles = sequelize.define('roles', {
         autoIncrement: true,
     },
     roleGroupId: {
-      type: Sequelize.STRING,
+      type: Sequelize.INTEGER,
       allowNull: false,
     },
     guildId: {
