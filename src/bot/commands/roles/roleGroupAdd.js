@@ -4,11 +4,12 @@ const {RoleGroups} = require('../../../models.js')
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('createrolegroup')
-		.setDescription('Creates a role group')
+		.setDescription('creates a role group')
 	
 		.addStringOption(option =>
 			option.setName('name')
 			.setDescription('the name of the new group')
+			.setRequired(true)
 		),
 
 	async execute(interaction) {
