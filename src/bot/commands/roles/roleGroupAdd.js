@@ -21,7 +21,7 @@ module.exports = {
 			}
 		})
 
-		if(doesRoleGroupExist) {
+		if (doesRoleGroupExist) {
 			await interaction.reply({
 				content: "role group already exists",
 				flags: MessageFlags.Ephemeral, 
