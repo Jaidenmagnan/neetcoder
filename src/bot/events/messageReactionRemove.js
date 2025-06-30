@@ -1,5 +1,12 @@
 const { Events } = require('discord.js');
-const { ReactionRoles } = require('../../models.js');
+const { RoleGroups, Roles } = require('../../models.js');
+
+function extractDiscordEmojiId(reaction) {
+    if (!reaction.id) {
+        return reaction.name;
+    }
+    return reaction.id;
+}
 
 module.exports = {
     name: Events.MessageReactionRemove,
@@ -10,22 +17,26 @@ module.exports = {
             await reaction.fetch();
         }
 
-        const emojiString = reaction.emoji.id ?
-            `<${reaction.emoji.animated ? 'a' : ''}:${reaction.emoji.name}:${reaction.emoji.id}>` :
-            reaction.emoji.name;
+		const emojiString = extractDiscordEmojiId(reaction.emoji);
 
-        const reactionRole = await ReactionRoles.findOne({
+        const roleGroup = await RoleGroups.findOne({
             where: {
-                messageid: reaction.message.id,
-                guildid: reaction.message.guild.id,
-                emoji: emojiString,
+                messageId: reaction.message.id,
+                guildId: reaction.message.guild.id,
             },
         });
 
-        if (reactionRole) {
+        if (roleGroup) {
             try {
+				const reactionRole = await Roles.findOne({
+					where: {
+						guildId: reaction.message.guild.id,
+						roleGroupId: roleGroup.id,
+						emoji: emojiString,
+					}
+				})
                 const member = await reaction.message.guild.members.fetch(user.id);
-                const role = reaction.message.guild.roles.cache.get(reactionRole.roleid);
+                const role = await reaction.message.guild.roles.cache.get(reactionRole.roleId);
 
                 if (role && member) {
                     await member.roles.remove(role);

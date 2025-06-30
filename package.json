@@ -11,7 +11,7 @@
     "start:bot": "node src/bot/index.js",
     "start:server": "node src/server/server.js",
     "start:client": "cd src/client && npm run dev",
-    "start": "npm run heroku-postbuild && concurrently \"npm run start:bot\" \"npm run start:server\" \"npm run start:client\"",
+    "start": "npm run start:bot",
     "deploy-commands": "node deploy-commands.js",
     "dev": "concurrently \"npm run start:bot\" \"npm run start:server\" \"npm run start:client\"",
     "heroku-postbuild": "cd src/client && npm install && npm run build",
