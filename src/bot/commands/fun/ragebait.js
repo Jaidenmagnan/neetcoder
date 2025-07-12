@@ -13,20 +13,20 @@ module.exports = {
         const target = interaction.options.getUser('target');
 
         const ragebaits = [
-            `${target.username} is **chronically online**.`,
-            `${target.username} is **unemployed**.`,
-            `${target.username} is a **Discord mod**.`,
-            `${target.username} has never touched grass.`,
-            `${target.username} argues in YouTube comments.`,
-            `${target.username} gets ratioed on Twitter.`,
-            `${target.username} has never seen sunlight.`,
+            ` is **chronically online**.`,
+            ` is **unemployed**.`,
+            ` is a **Discord mod**.`,
+            ` has never touched grass.`,
+            ` argues in YouTube comments.`,
+            ` gets ratioed on Twitter.`,
+            ` has never seen sunlight.`,
         ];
 
         const ragebait = ragebaits[Math.floor(Math.random() * ragebaits.length)];
 
         const mention = `<@${target.id}>`;
         const embed = {
-            description: `**${mention}\n\n${ragebait}**`,
+            description: `**${mention}${ragebait}**`,
             image: {
                 url: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXZpYm15N2JvcHVyYXpyc2U5eTh6dnAyMDV3cXR2OWJsMXlhdDhyNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6UBFPWXTc3jUWZfRVi/giphy.gif',
             },
