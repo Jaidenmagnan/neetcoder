@@ -5,7 +5,12 @@ module.exports = {
     name: Events.MessageDelete,
     async execute(message) {
     if (!message.content.includes("https://x.com")) {
-        logMessageDeletion(message);
-        }
+		try {
+        	logMessageDeletion(message);
+		}
+		catch (error) {
+			console.log(error);
+			}
+    	}
     },
 }

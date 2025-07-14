@@ -4,11 +4,13 @@ import axios from "axios";
 export default function Leaderboard({ guildId }) {
     const [leaderboardData, setLeaderboardData] = useState([]);
     const [loading, setLoading] = useState(true);
+	console.log(guildId);
 
     useEffect(() => {
         setLoading(true);
         axios.get('/api/leaderboard' + '?guildId=' + guildId)
             .then(response => {
+				console.log(response);
                 // Filter out null users
                 const filteredData = response.data.filter(user => user.profile.userName != null);
                 setLeaderboardData(filteredData);
