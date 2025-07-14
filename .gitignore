@@ -1,6 +1,9 @@
 # dependencies (bun install)
 node_modules
 
+.envrc
+.direnv
+
 # output
 out
 dist
