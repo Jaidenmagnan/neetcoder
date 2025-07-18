@@ -63,7 +63,7 @@ module.exports = {
 	   })
 
 	  await interaction.reply({
-		  content: "chart sent!"
+		  content: "chart sent!",
 		  flags: MessageFlags.Ephemeral
 	  })
 	}
