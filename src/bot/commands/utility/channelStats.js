@@ -61,6 +61,11 @@ module.exports = {
       await interaction.channel.send({
       	content: chartBuffer,
 	   })
+
+	  await interaction.reply({
+		  content: "chart sent!"
+		  flags: MessageFlags.Ephemeral
+	  })
 	}
 };
 
@@ -73,7 +78,7 @@ function createTextChart(data, title = "data") {
     for (const [name, count] of Object.entries(data)) {
         const barLength = Math.round((count / maxValue) * maxBarLength);
         const bar = '█'.repeat(barLength);
-        const padding = ' '.repeat(Math.max(0, 20 - name.length));
+        const padding = ' '.repeat(Math.max(0, 25 - name.length));
         chart += `${name}${padding} │${bar} ${count}\n`;
     }
     
