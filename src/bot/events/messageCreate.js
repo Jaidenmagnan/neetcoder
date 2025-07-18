@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { Users } = require("../../models.js");
+const { Users, ChannelStats } = require("../../models.js");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -9,8 +9,10 @@ module.exports = {
 		await replaceX(message);
 		await omarsWeirdCommand(message);
         await logXp(message);
+		await logChannelStats(message);
     },
 };
+
 
 async function omarsWeirdCommand(message) {
     	if (message.content.trim() == "<@1373490238277550202>") {
@@ -33,6 +35,31 @@ async function omarsWeirdCommand(message) {
       		  }
       		}
     	}
+}
+
+async function logChannelStats(message) {
+	try {
+		let channelStats = await ChannelStats.findOne({
+			where: {
+				guild_id: message.guild.id,
+				channel_id: message.channel.id,
+			}
+		})
+
+		if (!channelStats) {
+			console.log("CHANNEL STATS NOT FOUND");
+			channelStats = await ChannelStats.create({
+				guild_id: message.guild.id,
+				channel_id: message.channel.id,
+				message_count: 0,
+			});
+		}
+		channelStats.increment('message_count');
+	}
+	catch {
+		console.log("error logging channel stats");
+	}
+
 }
 
 async function logXp(message) {
