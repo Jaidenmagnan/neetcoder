@@ -6,7 +6,82 @@ module.exports = {
     async execute(message) {
         if (message.author.bot) return;
         
-        // - dg: Fix x.com links ---
+		await replaceX(message);
+		await omarsWeirdCommand(message);
+        await logXp(message);
+    },
+};
+
+async function omarsWeirdCommand(message) {
+    	if (message.content.trim() == "<@1373490238277550202>") {
+      		if (message.author == "736025260800868423") {
+        		await message.reply("Can u leave me alone ur actually weird...");
+      		} else {
+        		await message.reply("What do you want from me.");
+      		}
+    	} else {
+      		let r = Math.floor(Math.random() * 500);
+      		if (r == 0) {
+      		  await message.reply("Hi!");
+      		} else if (
+      		  message.author == "314903883874828288" || message.author == "210133839861907456"
+      		) {
+      		  r = Math.floor(Math.random() * 1000);
+      		  if (r == 0) {
+      		    await message.reply("ur fat :joy:");
+      		    await message.reply("https://tenor.com/view/hulk-smash-gif-12677792749566644516");
+      		  }
+      		}
+    	}
+}
+
+async function logXp(message) {
+	try {
+    	let user = await Users.findOne({
+    	    where: {
+    	        userid: message.author.id,
+    	        guildid: message.guild.id,
+    	    },
+    	});
+
+    	if (!user) {
+    	    user = await Users.create({
+    	        userid: message.author.id,
+    	        guildid: message.guild.id,
+    	        message_count: 0,
+    	        level: 1,
+    	    });
+    	}
+    	user.increment("message_count");
+
+    	user_level = user.get("level");
+    	user_message_count = user.get("message_count");
+
+    	new_level = calculateLevel(user_message_count);
+
+    	if (new_level > user_level) {
+    	    await Users.update(
+    	        { 
+    	            level: new_level,
+    	        },
+    	        {
+    	            where: {
+    	                userid: message.author.id,
+    	                guildid: message.guild.id,
+    	            },
+    	        },
+    	    );
+
+    	    const userMention = `<@${message.author.id}>`;
+    	    message.channel.send(`${userMention} you leveled up!`);
+    	}
+	}
+	catch(e) {
+		console.log("error logging xp", e);
+	}
+}
+
+async function replaceX(message) {
         if (message.content.includes("https://x.com")) {
             let author = message.author.username;
             if (message.member.nickname !== null) {
@@ -28,75 +103,6 @@ module.exports = {
 				console.log(error);
 			}
         }
-        
-    	if (message.content.trim() == "<@1373490238277550202>") {
-      		if (message.author == "736025260800868423") {
-        		await message.reply("Can u leave me alone ur actually weird...");
-      		} else {
-        		await message.reply("What do you want from me.");
-      		}
-    	} else {
-      		let r = Math.floor(Math.random() * 500);
-      		if (r == 0) {
-      		  await message.reply("Hi!");
-      		} else if (
-      		  message.author == "314903883874828288" || message.author == "210133839861907456"
-      		) {
-      		  r = Math.floor(Math.random() * 1000);
-      		  if (r == 0) {
-      		    await message.reply("ur fat :joy:");
-      		    await message.reply("https://tenor.com/view/hulk-smash-gif-12677792749566644516");
-      		  }
-      		}
-    	}
-
-        try {
-            await logXp(message);
-        } catch (error) {
-            console.error("Error logging XP:", error);
-        }
-    },
-};
-
-async function logXp(message) {
-    let user = await Users.findOne({
-        where: {
-            userid: message.author.id,
-            guildid: message.guild.id,
-        },
-    });
-
-    if (!user) {
-        user = await Users.create({
-            userid: message.author.id,
-            guildid: message.guild.id,
-            message_count: 0,
-            level: 1,
-        });
-    }
-    user.increment("message_count");
-
-    user_level = user.get("level");
-    user_message_count = user.get("message_count");
-
-    new_level = calculateLevel(user_message_count);
-
-    if (new_level > user_level) {
-        await Users.update(
-            { 
-                level: new_level,
-            },
-            {
-                where: {
-                    userid: message.author.id,
-                    guildid: message.guild.id,
-                },
-            },
-        );
-
-        const userMention = `<@${message.author.id}>`;
-        message.channel.send(`${userMention} you leveled up!`);
-    }
 }
 
 function calculateLevel(message_count) {

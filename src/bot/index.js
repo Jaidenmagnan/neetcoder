@@ -1,8 +1,8 @@
 // Require the necessary discord.js classes
-const { Client, Collection, GatewayIntentBits, Partials, Options } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-require('dotenv').config(); const express = require('express'); // Add this at the top 
+require('dotenv').config(); const express = require('express'); 
 
 let isInitialized = false;
 
@@ -10,7 +10,7 @@ function createHealthCheckpoint() {
     const app = express();
     const PORT = process.env.BOT_HEALTH_PORT || 4000;
 
-    app.get('/health', (req, res) => {
+    app.get('/health', (_, res) => {
         res.status(200).json({ status: 'ok' });
     });
 
@@ -34,27 +34,6 @@ const client = new Client({
         Partials.Channel,
         Partials.Reaction,
     ],
-	sweepers: {
-    	messages: {
-      		interval: 1800, // 30 minutes
-      		lifetime: 300,  // 5 minutes
-     		},
-	},
-		makeCache: Options.cacheWithLimits({
-        	MessageManager: 50,           // Reduce from default 200
-        	UserManager: 100,             // Reduce from default Infinity
-        	GuildMemberManager: 50,       // Reduce from default 200
-        	ReactionManager: 10,          // Reduce from default 200
-        	ReactionUserManager: 10,      // Reduce from default 200
-        	ThreadManager: 25,            // Reduce from default 200
-        	ThreadMemberManager: 10,      // Reduce from default 200
-        	StageInstanceManager: 0,      // Disable if not using voice stages
-        	GuildScheduledEventManager: 0, // Disable if not using events
-        	// Keep these at Infinity if you need them
-        	ChannelManager: Infinity,     
-        	GuildManager: Infinity,
-        	RoleManager: Infinity,
-    }),
 });
 
 function loadCommands() {
@@ -82,7 +61,6 @@ function loadCommands() {
 }
 
 // message listener for reloading
-
 function loadEvents() {
 	client.removeAllListeners();
     const eventsPath = path.join(__dirname, 'events');
@@ -100,6 +78,7 @@ function loadEvents() {
         }
     }
 }
+
 function initialize() {
 	if ( !isInitialized ) {
 		loadCommands();
@@ -115,6 +94,3 @@ if (require.main === module) {
 }
 
 module.exports = { loadCommands, loadEvents, client };
-
-
-
