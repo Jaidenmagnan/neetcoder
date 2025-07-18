@@ -55,6 +55,29 @@ const Users = sequelize.define('users', {
     },
 });
 
+const ChannelStats = sequelize.define('channel_stats', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true,
+	},
+	message_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0,
+		allowNull: false
+	},
+	channel_id: {
+		type: Sequelize.STRING,
+		defaultValue: 1,
+		allowNull: false,
+	},
+	guild_id: {
+		type: Sequelize.STRING,
+		defaultValue: 1,
+		allowNull: false,
+	}
+})
+
 const UserAuth = sequelize.define('user_auth', {
     id: {
       type: Sequelize.INTEGER,
@@ -230,4 +253,4 @@ const Books = sequelize.define('books', {
   },
 });
 
-module.exports = { Guilds, UserAuth, Users, Sequelize, Configurations, Roles, RoleGroups, Votes, Books };
+module.exports = { Guilds, ChannelStats, UserAuth, Users, Sequelize, Configurations, Roles, RoleGroups, Votes, Books };

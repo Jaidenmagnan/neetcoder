@@ -1,5 +1,5 @@
 const { Events, ActivityType } = require('discord.js');
-const { Guilds, Users, Configurations, Roles, RoleGroups, Votes, Books, UserAuth } = require('../../models.js');
+const { Guilds, Users, ChannelStats, Configurations, Roles, RoleGroups, Votes, Books, UserAuth } = require('../../models.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -7,6 +7,7 @@ module.exports = {
     async execute(client) {
         await Users.sync({ alter: true });
         await Configurations.sync({ alter: true });
+		await ChannelStats.sync({alter: true});
         await Roles.sync({ alter: true });
 		await RoleGroups.sync({ alter: true });
         await UserAuth.sync({ alter: true });
