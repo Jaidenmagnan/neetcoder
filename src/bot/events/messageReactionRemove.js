@@ -17,7 +17,7 @@ module.exports = {
             await reaction.fetch();
         }
 
-		const emojiString = extractDiscordEmojiId(reaction.emoji);
+        const emojiString = extractDiscordEmojiId(reaction.emoji);
 
         const roleGroup = await RoleGroups.findOne({
             where: {
@@ -28,22 +28,25 @@ module.exports = {
 
         if (roleGroup) {
             try {
-				const reactionRole = await Roles.findOne({
-					where: {
-						guildId: reaction.message.guild.id,
-						roleGroupId: roleGroup.id,
-						emoji: emojiString,
-					}
-				})
-                const member = await reaction.message.guild.members.fetch(user.id);
-                const role = await reaction.message.guild.roles.cache.get(reactionRole.roleId);
+                const reactionRole = await Roles.findOne({
+                    where: {
+                        guildId: reaction.message.guild.id,
+                        roleGroupId: roleGroup.id,
+                        emoji: emojiString,
+                    },
+                });
+                const member = await reaction.message.guild.members.fetch(
+                    user.id
+                );
+                const role = await reaction.message.guild.roles.cache.get(
+                    reactionRole.roleId
+                );
 
                 if (role && member) {
                     await member.roles.remove(role);
                     console.log(`Removed role ${role.name} from ${user.tag}`);
                 }
-            }
-            catch {
+            } catch {
                 console.log('error removing reaction role');
             }
         }

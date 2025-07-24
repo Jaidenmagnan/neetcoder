@@ -4,8 +4,9 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('ragebait')
         .setDescription('ragebaits a user')
-        .addUserOption(option =>
-            option.setName('target')
+        .addUserOption((option) =>
+            option
+                .setName('target')
                 .setDescription('The user to ragebait')
                 .setRequired(true)
         ),
@@ -22,7 +23,8 @@ module.exports = {
             ` has never seen sunlight.`,
         ];
 
-        const ragebait = ragebaits[Math.floor(Math.random() * ragebaits.length)];
+        const ragebait =
+            ragebaits[Math.floor(Math.random() * ragebaits.length)];
 
         const mention = `<@${target.id}>`;
         const embed = {

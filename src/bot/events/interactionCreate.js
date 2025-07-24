@@ -4,32 +4,41 @@ const { Votes, Configurations } = require('../../models.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
-
         if (interaction.isButton()) {
-            if (interaction.customId.startsWith("vote_timeout_")) {
+            if (interaction.customId.startsWith('vote_timeout_')) {
                 await votetimeout(interaction);
             }
         }
 
         // for the commands
         if (interaction.isChatInputCommand()) {
-            const command = interaction.client.commands.get(interaction.commandName);
+            const command = interaction.client.commands.get(
+                interaction.commandName
+            );
 
             if (!command) {
                 console.log('MESSAGE SENT');
-                console.error(`No command matching ${interaction.commandName} was found.`);
+                console.error(
+                    `No command matching ${interaction.commandName} was found.`
+                );
                 return;
             }
             try {
                 await command.execute(interaction);
-            }
-            catch (error) {
+            } catch (error) {
                 console.error(error);
                 if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-                }
-                else {
-                    await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+                    await interaction.followUp({
+                        content:
+                            'There was an error while executing this command!',
+                        flags: MessageFlags.Ephemeral,
+                    });
+                } else {
+                    await interaction.reply({
+                        content:
+                            'There was an error while executing this command!',
+                        flags: MessageFlags.Ephemeral,
+                    });
                 }
             }
         }
@@ -74,12 +83,12 @@ async function votetimeout(interaction) {
     const user_id = config.get('userid');
 
     let decision;
-    if (interaction.customId == "vote_timeout_yes") {
-        decision = "YES";
+    if (interaction.customId == 'vote_timeout_yes') {
+        decision = 'YES';
     }
 
-    if (interaction.customId == "vote_timeout_no") {
-        decision = "NO";
+    if (interaction.customId == 'vote_timeout_no') {
+        decision = 'NO';
     }
 
     await interaction.deferUpdate();
@@ -100,19 +109,20 @@ async function votetimeout(interaction) {
 
     let num_yes = 0;
 
-
     const member = await interaction.guild.members.fetch(user_id);
 
-    votes.forEach(element => {
-        if (element.get('votestatus') === "YES") {
+    votes.forEach((element) => {
+        if (element.get('votestatus') === 'YES') {
             num_yes += 1;
         }
     });
 
     const updatedEmbed = new EmbedBuilder()
         .setTitle('IMPORTANT NOTICE!')
-        .setDescription(`Should ${member.displayName} be banished into the low-level-thinker realm?`)
-        .setColor("#FF6347")
+        .setDescription(
+            `Should ${member.displayName} be banished into the low-level-thinker realm?`
+        )
+        .setColor('#FF6347')
         .setThumbnail(member.displayAvatarURL({ dynamic: true, size: 128 }))
         .addFields({
             name: 'Votes',
@@ -124,7 +134,7 @@ async function votetimeout(interaction) {
 
     if (num_yes >= votes_needed) {
         await interaction.channel.send({
-            content: "peace out lil bro",
+            content: 'peace out lil bro',
         });
 
         await member.timeout(length, 'Timed out!');
@@ -141,6 +151,5 @@ async function votetimeout(interaction) {
                 guildid: interaction.guild.id,
             },
         });
-    };
-
+    }
 }

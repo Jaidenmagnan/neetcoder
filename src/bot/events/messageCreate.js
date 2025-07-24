@@ -1,135 +1,130 @@
-const { Events } = require("discord.js");
-const { Users, ChannelStats } = require("../../models.js");
+const { Events } = require('discord.js');
+const { Users, ChannelStats } = require('../../models.js');
 
 module.exports = {
     name: Events.MessageCreate,
     async execute(message) {
         if (message.author.bot) return;
-        
-		await replaceX(message);
-		await omarsWeirdCommand(message);
+
+        await replaceX(message);
+        await omarsWeirdCommand(message);
         await logXp(message);
-		await logChannelStats(message);
+        await logChannelStats(message);
     },
 };
 
-
 async function omarsWeirdCommand(message) {
-    	if (message.content.trim() == "<@1373490238277550202>") {
-      		if (message.author == "736025260800868423") {
-        		await message.reply("Can u leave me alone ur actually weird...");
-      		} else {
-        		await message.reply("What do you want from me.");
-      		}
-    	} else {
-      		let r = Math.floor(Math.random() * 500);
-      		if (r == 0) {
-      		  await message.reply("Hi!");
-      		} else if (
-      		  message.author == "314903883874828288" || message.author == "210133839861907456"
-      		) {
-      		  r = Math.floor(Math.random() * 1000);
-      		  if (r == 0) {
-      		    await message.reply("ur fat :joy:");
-      		    await message.reply("https://tenor.com/view/hulk-smash-gif-12677792749566644516");
-      		  }
-      		}
-    	}
+    if (message.content.trim() == '<@1373490238277550202>') {
+        if (message.author == '736025260800868423') {
+            await message.reply('Can u leave me alone ur actually weird...');
+        } else {
+            await message.reply('What do you want from me.');
+        }
+    } else {
+        let r = Math.floor(Math.random() * 500);
+        if (r == 0) {
+            await message.reply('Hi!');
+        } else if (
+            message.author == '314903883874828288' ||
+            message.author == '210133839861907456'
+        ) {
+            r = Math.floor(Math.random() * 1000);
+            if (r == 0) {
+                await message.reply('ur fat :joy:');
+                await message.reply(
+                    'https://tenor.com/view/hulk-smash-gif-12677792749566644516'
+                );
+            }
+        }
+    }
 }
 
 async function logChannelStats(message) {
-	try {
-		let channelStats = await ChannelStats.findOne({
-			where: {
-				guild_id: message.guild.id,
-				channel_id: message.channel.id,
-			}
-		})
+    try {
+        let channelStats = await ChannelStats.findOne({
+            where: {
+                guild_id: message.guild.id,
+                channel_id: message.channel.id,
+            },
+        });
 
-		if (!channelStats) {
-			console.log("CHANNEL STATS NOT FOUND");
-			channelStats = await ChannelStats.create({
-				guild_id: message.guild.id,
-				channel_id: message.channel.id,
-				message_count: 0,
-			});
-		}
-		channelStats.increment('message_count');
-	}
-	catch {
-		console.log("error logging channel stats");
-	}
-
+        if (!channelStats) {
+            console.log('CHANNEL STATS NOT FOUND');
+            channelStats = await ChannelStats.create({
+                guild_id: message.guild.id,
+                channel_id: message.channel.id,
+                message_count: 0,
+            });
+        }
+        channelStats.increment('message_count');
+    } catch {
+        console.log('error logging channel stats');
+    }
 }
 
 async function logXp(message) {
-	try {
-    	let user = await Users.findOne({
-    	    where: {
-    	        userid: message.author.id,
-    	        guildid: message.guild.id,
-    	    },
-    	});
+    try {
+        let user = await Users.findOne({
+            where: {
+                userid: message.author.id,
+                guildid: message.guild.id,
+            },
+        });
 
-    	if (!user) {
-    	    user = await Users.create({
-    	        userid: message.author.id,
-    	        guildid: message.guild.id,
-    	        message_count: 0,
-    	        level: 1,
-    	    });
-    	}
-    	user.increment("message_count");
+        if (!user) {
+            user = await Users.create({
+                userid: message.author.id,
+                guildid: message.guild.id,
+                message_count: 0,
+                level: 1,
+            });
+        }
+        user.increment('message_count');
 
-    	user_level = user.get("level");
-    	user_message_count = user.get("message_count");
+        user_level = user.get('level');
+        user_message_count = user.get('message_count');
 
-    	new_level = calculateLevel(user_message_count);
+        new_level = calculateLevel(user_message_count);
 
-    	if (new_level > user_level) {
-    	    await Users.update(
-    	        { 
-    	            level: new_level,
-    	        },
-    	        {
-    	            where: {
-    	                userid: message.author.id,
-    	                guildid: message.guild.id,
-    	            },
-    	        },
-    	    );
+        if (new_level > user_level) {
+            await Users.update(
+                {
+                    level: new_level,
+                },
+                {
+                    where: {
+                        userid: message.author.id,
+                        guildid: message.guild.id,
+                    },
+                }
+            );
 
-    	    const userMention = `<@${message.author.id}>`;
-    	    message.channel.send(`${userMention} you leveled up!`);
-    	}
-	}
-	catch(e) {
-		console.log("error logging xp", e);
-	}
+            const userMention = `<@${message.author.id}>`;
+            message.channel.send(`${userMention} you leveled up!`);
+        }
+    } catch (e) {
+        console.log('error logging xp', e);
+    }
 }
 
 async function replaceX(message) {
-        if (message.content.includes("https://x.com")) {
-            let author = message.author.username;
-            if (message.member.nickname !== null) {
-                author = message.member.nickname;
-            }
-        
-            let msg = message.content.replace("x.com", "fixvx.com");
-        
-			try {
-            	let result = "**" +
-            	            author +
-            	            " shared a tweet:**\n" +
-            	            msg;
-        
-            	await message.channel.send(result);
-            	await message.delete();
-			}
-			catch (error){
-				console.log(error);
-			}
+    if (message.content.includes('https://x.com')) {
+        let author = message.author.username;
+        if (message.member.nickname !== null) {
+            author = message.member.nickname;
         }
+
+        let msg = message.content.replace('x.com', 'fixvx.com');
+
+        try {
+            let result = '**' + author + ' shared a tweet:**\n' + msg;
+
+            await message.channel.send(result);
+            await message.delete();
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 function calculateLevel(message_count) {

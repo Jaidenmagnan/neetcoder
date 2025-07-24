@@ -17,7 +17,7 @@ module.exports = {
             await reaction.fetch();
         }
 
-		const emojiString = extractDiscordEmojiId(reaction.emoji);
+        const emojiString = extractDiscordEmojiId(reaction.emoji);
 
         const roleGroup = await RoleGroups.findOne({
             where: {
@@ -28,24 +28,26 @@ module.exports = {
 
         if (roleGroup) {
             try {
-				const reactionRole = await Roles.findOne({
-					where: {
-						guildId: reaction.message.guild.id,
-						roleGroupId: roleGroup.id,
-						emoji: emojiString,
-					}
-				})
+                const reactionRole = await Roles.findOne({
+                    where: {
+                        guildId: reaction.message.guild.id,
+                        roleGroupId: roleGroup.id,
+                        emoji: emojiString,
+                    },
+                });
 
-              	const member = await reaction.message.guild.members.fetch(user.id);
-                const role = await reaction.message.guild.roles.cache.get(reactionRole.roleId);
+                const member = await reaction.message.guild.members.fetch(
+                    user.id
+                );
+                const role = await reaction.message.guild.roles.cache.get(
+                    reactionRole.roleId
+                );
 
                 if (role && member) {
-                	await member.roles.add(role);
-                	console.log(`Added role ${role.name} to ${user.tag}`);
+                    await member.roles.add(role);
+                    console.log(`Added role ${role.name} to ${user.tag}`);
                 }
-  
-            }
-            catch(err) {
+            } catch (err) {
                 console.log('error adding reaction role');
             }
         }

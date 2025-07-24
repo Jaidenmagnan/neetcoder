@@ -1,8 +1,14 @@
 // Require the necessary discord.js classes
-const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const {
+    Client,
+    Collection,
+    GatewayIntentBits,
+    Partials,
+} = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-require('dotenv').config(); const express = require('express'); 
+require('dotenv').config();
+const express = require('express');
 
 let isInitialized = false;
 
@@ -18,7 +24,7 @@ function createHealthCheckpoint() {
         console.log(`Bot health-check running on port ${PORT}`);
     });
 
-    return {app}
+    return { app };
 }
 
 const client = new Client({
@@ -29,11 +35,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.MessageContent,
     ],
-    partials: [
-        Partials.Message,
-        Partials.Channel,
-        Partials.Reaction,
-    ],
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
 function loadCommands() {
@@ -44,7 +46,9 @@ function loadCommands() {
 
     for (const folder of commandFolders) {
         const commandsPath = path.join(foldersPath, folder);
-        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+        const commandFiles = fs
+            .readdirSync(commandsPath)
+            .filter((file) => file.endsWith('.js'));
         for (const file of commandFiles) {
             const filePath = path.join(commandsPath, file);
             delete require.cache[require.resolve(filePath)];
@@ -54,7 +58,9 @@ function loadCommands() {
                 delete require.cache[require.resolve(filePath)];
                 client.commands.set(command.data.name, command);
             } else {
-                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+                console.log(
+                    `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+                );
             }
         }
     }
@@ -62,9 +68,11 @@ function loadCommands() {
 
 // message listener for reloading
 function loadEvents() {
-	client.removeAllListeners();
+    client.removeAllListeners();
     const eventsPath = path.join(__dirname, 'events');
-    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+    const eventFiles = fs
+        .readdirSync(eventsPath)
+        .filter((file) => file.endsWith('.js'));
 
     for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
@@ -72,25 +80,24 @@ function loadEvents() {
         const event = require(filePath);
         if (event.once) {
             client.once(event.name, (...args) => event.execute(...args));
-        }
-        else {
+        } else {
             client.on(event.name, (...args) => event.execute(...args));
         }
     }
 }
 
 function initialize() {
-	if ( !isInitialized ) {
-		loadCommands();
-		loadEvents();
-		createHealthCheckpoint();
-		client.login(process.env.TOKEN);
-		isInitialized = true;
-	}
+    if (!isInitialized) {
+        loadCommands();
+        loadEvents();
+        createHealthCheckpoint();
+        client.login(process.env.TOKEN);
+        isInitialized = true;
+    }
 }
 
 if (require.main === module) {
-	initialize();
+    initialize();
 }
 
 module.exports = { loadCommands, loadEvents, client };
