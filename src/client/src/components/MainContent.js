@@ -1,4 +1,4 @@
-import Leaderboard from "./Leaderboard";
+import Leaderboard from './Leaderboard';
 function MainContent({ feature, guild }) {
     if (!guild) {
         return (
@@ -8,9 +8,7 @@ function MainContent({ feature, guild }) {
                     alt="Snoopy"
                     className="mb-4 w-72 h-72 object-contain"
                 />
-                <h1
-                    className="text-4xl font-bold mb-4 font-luckyguy"
-                >
+                <h1 className="text-4xl font-bold mb-4 font-luckyguy">
                     Select a Guild!
                 </h1>
             </div>
@@ -24,9 +22,7 @@ function MainContent({ feature, guild }) {
                     alt="Snoopy"
                     className="mb-4 w-72 h-72 object-contain"
                 />
-                <h1
-                    className="text-4xl font-bold mb-4 font-luckyguy"
-                >
+                <h1 className="text-4xl font-bold mb-4 font-luckyguy">
                     Select a Feature!
                 </h1>
             </div>
@@ -34,13 +30,17 @@ function MainContent({ feature, guild }) {
     }
 
     switch (feature) {
-        case "Leaderboard":
+        case 'Leaderboard':
             return <Leaderboard guildId={guild.id} />;
         default:
             return (
                 <div className="flex flex-col items-center justify-center h-full w-full">
-                    <h1 className="text-4xl font-bold mb-4 font-luckyguy">Feature Not Implemented</h1>
-                    <p className="text-lg text-gray-600 font-luckyguy">This feature is coming soon!</p>
+                    <h1 className="text-4xl font-bold mb-4 font-luckyguy">
+                        Feature Not Implemented
+                    </h1>
+                    <p className="text-lg text-gray-600 font-luckyguy">
+                        This feature is coming soon!
+                    </p>
                 </div>
             );
     }

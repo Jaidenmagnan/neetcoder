@@ -1,46 +1,44 @@
 const { MessageFlags, SlashCommandBuilder } = require('discord.js');
-const {RoleGroups} = require('../../../models.js')
+const { RoleGroups } = require('../../../models.js');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('createrolegroup')
-		.setDescription('creates a role group')
-	
-		.addStringOption(option =>
-			option.setName('name')
-			.setDescription('the name of the new group')
-			.setRequired(true)
-		),
+    data: new SlashCommandBuilder()
+        .setName('createrolegroup')
+        .setDescription('creates a role group')
 
-	async execute(interaction) {
-		const name = interaction.options.getString('name')
+        .addStringOption((option) =>
+            option
+                .setName('name')
+                .setDescription('the name of the new group')
+                .setRequired(true)
+        ),
 
-		const doesRoleGroupExist = !! await RoleGroups.findOne({
-			where: {
-				name: name,
-				guildId: interaction.guild.id,
-			}
-		})
+    async execute(interaction) {
+        const name = interaction.options.getString('name');
 
-		if (doesRoleGroupExist) {
-			await interaction.reply({
-				content: "role group already exists",
-				flags: MessageFlags.Ephemeral, 
-			})
-			return;
-		}
+        const doesRoleGroupExist = !!(await RoleGroups.findOne({
+            where: {
+                name: name,
+                guildId: interaction.guild.id,
+            },
+        }));
 
+        if (doesRoleGroupExist) {
+            await interaction.reply({
+                content: 'role group already exists',
+                flags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
 
-		await RoleGroups.create({
-			name: name,
-			guildId: interaction.guild.id,
-		})
+        await RoleGroups.create({
+            name: name,
+            guildId: interaction.guild.id,
+        });
 
-		await interaction.reply({
-			content: "added role group: " + name,
-			flags: MessageFlags.Ephemeral,
-
-		})
-		
-	}
-}
+        await interaction.reply({
+            content: 'added role group: ' + name,
+            flags: MessageFlags.Ephemeral,
+        });
+    },
+};

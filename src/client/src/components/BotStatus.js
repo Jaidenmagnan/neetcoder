@@ -6,8 +6,8 @@ export default function BotStatus() {
 
     useEffect(() => {
         fetch('/api/bot-status')
-            .then(res => res.json())
-            .then(data => setStatus(data));
+            .then((res) => res.json())
+            .then((data) => setStatus(data));
     }, []);
 
     const barColor = status.isOnline ? '#4CAF50' : '#FF6F6F';
@@ -29,10 +29,12 @@ export default function BotStatus() {
                 </div>
             </div>
             <div className="fixed left-0 right-0 bottom-10 flex justify-center z-10">
-                <a href={status.discordLink} target="_blank" rel="noopener noreferrer">
-                    <button
-                        className="bg-[#9CAF88] font-luckyguy text-white text-[1.3rem] border-[3px] border-[#e0c097] rounded-[25px] px-10 py-4 shadow-md cursor-pointer transition duration-200 hover:bg-[#8A9C7A] active:scale-95"
-                    >
+                <a
+                    href={status.discordLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <button className="bg-[#9CAF88] font-luckyguy text-white text-[1.3rem] border-[3px] border-[#e0c097] rounded-[25px] px-10 py-4 shadow-md cursor-pointer transition duration-200 hover:bg-[#8A9C7A] active:scale-95">
                         Add to Server
                     </button>
                 </a>

@@ -5,46 +5,47 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('reactionroleremove')
         .setDescription('Remove a reaction role from a message.')
-        .addStringOption(option =>
-            option.setName('groupname')
+        .addStringOption((option) =>
+            option
+                .setName('groupname')
                 .setDescription('the name of the group you are removing from')
-                .setRequired(true),
+                .setRequired(true)
         )
-        .addRoleOption(option =>
-            option.setName('role')
+        .addRoleOption((option) =>
+            option
+                .setName('role')
                 .setDescription('The role of which you are removing.')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
-		const groupName = interaction.options.getRole('groupName');
+        const groupName = interaction.options.getRole('groupName');
         const roleId = interaction.options.getRole('role').id;
 
         try {
-			const roleGroupId = await RoleGroups.findone({
-				where: {
-					name: groupName,
-				}
-			})
+            const roleGroupId = await RoleGroups.findone({
+                where: {
+                    name: groupName,
+                },
+            });
 
-			if(!roleGroupId) {
-				await interaction.reply({
-					content: "role group not found!",
-					flags: MessageFlags.Ephemeral,
-				})
-				return;
-			}
+            if (!roleGroupId) {
+                await interaction.reply({
+                    content: 'role group not found!',
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
 
             await Roles.destroy({
                 where: {
                     guildid: interaction.guild.id,
-					groupId: roleGroupId,
+                    groupId: roleGroupId,
                     roleid: roleId,
                     emoji: emoji,
                 },
             });
-        }
-        catch (error) {
+        } catch (error) {
             await interaction.reply({
                 content: 'role could not be removed from group',
                 flags: MessageFlags.Ephemeral,

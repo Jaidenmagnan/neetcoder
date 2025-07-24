@@ -10,7 +10,7 @@ const turndownService = new TurndownService({
 // Configure Turndown for Discord-specific formatting
 turndownService.addRule('codeBlocks', {
     filter: ['pre', 'code'],
-    replacement: function(content, node) {
+    replacement: function (content, node) {
         if (node.parentNode && node.parentNode.nodeName === 'PRE') {
             return '\n```\n' + content + '\n```\n';
         }
@@ -21,29 +21,33 @@ turndownService.addRule('codeBlocks', {
 function getDifficultyColor(difficulty) {
     switch (difficulty.toLowerCase()) {
         case 'easy':
-            return 0x98FB98; // Pale Green
+            return 0x98fb98; // Pale Green
         case 'medium':
-            return 0xFFB6C1; // Light Pink
+            return 0xffb6c1; // Light Pink
         case 'hard':
-            return 0xFFA07A; // Light Salmon
+            return 0xffa07a; // Light Salmon
         default:
-            return 0xD3D3D3; // Light Gray
+            return 0xd3d3d3; // Light Gray
     }
 }
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('daily')
-        .setDescription('Post today\'s LeetCode problem'),
+        .setDescription("Post today's LeetCode problem"),
 
     async execute(interaction) {
         await interaction.deferReply();
 
         try {
-            const response = await fetch('https://alfa-leetcode-api.onrender.com/daily');
+            const response = await fetch(
+                'https://alfa-leetcode-api.onrender.com/daily'
+            );
             const problem = await response.json();
 
-            const formattedDescription = turndownService.turndown(problem.question);
+            const formattedDescription = turndownService.turndown(
+                problem.question
+            );
 
             const embed = {
                 title: `Daily LeetCode Problem: ${problem.questionTitle}`,
@@ -61,10 +65,12 @@ module.exports = {
                 autoArchiveDuration: 1440,
             });
 
-            await interaction.editReply('Posted today\'s LeetCode problem!');
+            await interaction.editReply("Posted today's LeetCode problem!");
         } catch (error) {
             console.error('Error posting daily LeetCode problem:', error);
-            await interaction.editReply('There was an error fetching the daily problem. Please try again later.');
+            await interaction.editReply(
+                'There was an error fetching the daily problem. Please try again later.'
+            );
         }
     },
-}; 
+};
