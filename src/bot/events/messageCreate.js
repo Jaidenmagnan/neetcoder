@@ -108,7 +108,7 @@ async function logXp(message) {
 }
 
 async function replaceX(message) {
-    if (message.content.includes('https://x.com')) {
+    if (message.content.toLowerCase().includes('https://x.com')) {
         let author = message.author.username;
         if (message.member.nickname !== null) {
             author = message.member.nickname;
