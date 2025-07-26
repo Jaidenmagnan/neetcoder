@@ -1,6 +1,6 @@
 const express = require('express');
 const { UserAuth, Guilds, Users } = require('../models.js');
-const { client } = require('../bot/index.js');
+const { client } = require('index.js');
 const axios = require('axios');
 require('dotenv').config();
 const path = require('path');
@@ -9,22 +9,15 @@ const cors = require('cors');
 const authenticate = require('./middlewares/authenticate');
 const cookieParser = require('cookie-parser');
 
-async function isBotOnline() {
-    const BOT_HEALTH_PORT = process.env.BOT_HEALTH_PORT || 4000;
-    const url = `http://localhost:${BOT_HEALTH_PORT}/health`;
 
-    try {
-        const response = await axios.get(url, { timeout: 1000 });
-        return response.status === 200;
-    } catch (error) {
-        return false;
-    }
+async function isBotOnline() {
+	return true;
 }
 
 function createServer() {
-    const app = express();
-    const PORT = process.env.PORT || 3000;
+	const app = express();
 
+	const PORT = process.env.PORT || 3000
     app.use(
         cors({
             credentials: true,
@@ -60,7 +53,7 @@ function createServer() {
     app.get('/auth/sign-in', async ({ query }, response) => {
         const clientId = process.env.CLIENT_ID;
         const clientSecret = process.env.CLIENT_SECRET;
-        const PORT = process.env.PORT;
+		console.log("SIGNING IN");
 
         const { code } = query;
 
@@ -111,7 +104,7 @@ function createServer() {
                     });
                 }
 
-                const token = await sign(
+                const token = sign(
                     {
                         sub: id,
                         token_type: oauthData.token_type,
@@ -238,11 +231,12 @@ function createServer() {
         });
     }
 
-    const server = app.listen(PORT, () => {
-        console.log(`Web server running on port ${PORT}`);
+    app.listen(PORT, () => {
+        console.log(`Server running on ${PORT}`);
     });
 
-    return { app, server };
+	return app;
 }
 
-const { app, server } = createServer();
+module.exports = {createServer}
+
