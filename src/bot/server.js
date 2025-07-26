@@ -8,15 +8,14 @@ const cors = require('cors');
 const authenticate = require('./middlewares/authenticate');
 const cookieParser = require('cookie-parser');
 
-
 async function isBotOnline() {
-	return true;
+    return true;
 }
 
 function createServer(client) {
-	const app = express();
+    const app = express();
 
-	const PORT = process.env.PORT || 3000
+    const PORT = process.env.PORT || 3000;
     app.use(
         cors({
             credentials: true,
@@ -52,7 +51,7 @@ function createServer(client) {
     app.get('/auth/sign-in', async ({ query }, response) => {
         const clientId = process.env.CLIENT_ID;
         const clientSecret = process.env.CLIENT_SECRET;
-		console.log("SIGNING IN");
+        console.log('SIGNING IN');
 
         const { code } = query;
 
@@ -234,8 +233,7 @@ function createServer(client) {
         console.log(`Server running on ${PORT}`);
     });
 
-	return app;
+    return app;
 }
 
-module.exports = {createServer}
-
+module.exports = { createServer };

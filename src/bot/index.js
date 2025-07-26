@@ -12,7 +12,6 @@ require('dotenv').config();
 
 let isInitialized = false;
 
-
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -77,7 +76,7 @@ function initialize() {
         loadCommands();
         loadEvents();
         client.login(process.env.TOKEN);
-		createServer(client);
+        createServer(client);
         isInitialized = true;
     }
 }
