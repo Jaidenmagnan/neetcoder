@@ -6,26 +6,11 @@ const {
     Partials,
 } = require('discord.js');
 const fs = require('node:fs');
+const { createServer } = require('./server.js');
 const path = require('node:path');
 require('dotenv').config();
-const express = require('express');
 
 let isInitialized = false;
-
-function createHealthCheckpoint() {
-    const app = express();
-    const PORT = process.env.BOT_HEALTH_PORT || 4000;
-
-    app.get('/health', (_, res) => {
-        res.status(200).json({ status: 'ok' });
-    });
-
-    app.listen(PORT, () => {
-        console.log(`Bot health-check running on port ${PORT}`);
-    });
-
-    return { app };
-}
 
 const client = new Client({
     intents: [
@@ -90,8 +75,8 @@ function initialize() {
     if (!isInitialized) {
         loadCommands();
         loadEvents();
-        createHealthCheckpoint();
         client.login(process.env.TOKEN);
+        createServer(client);
         isInitialized = true;
     }
 }
