@@ -6,7 +6,7 @@ const {
     Partials,
 } = require('discord.js');
 const fs = require('node:fs');
-const { createServer } = require('server.js');
+const { createServer } = require('./server.js');
 const path = require('node:path');
 require('dotenv').config();
 

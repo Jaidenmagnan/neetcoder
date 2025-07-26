@@ -1,6 +1,6 @@
 const express = require('express');
 const { UserAuth, Guilds, Users } = require('../models.js');
-const { client } = require('index.js');
+const { client } = require('./index.js');
 const axios = require('axios');
 require('dotenv').config();
 const path = require('path');
