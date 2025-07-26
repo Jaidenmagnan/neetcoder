@@ -76,8 +76,8 @@ function initialize() {
     if (!isInitialized) {
         loadCommands();
         loadEvents();
-		createServer();
         client.login(process.env.TOKEN);
+		createServer(client);
         isInitialized = true;
     }
 }

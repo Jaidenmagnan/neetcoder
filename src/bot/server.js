@@ -1,6 +1,5 @@
 const express = require('express');
 const { UserAuth, Guilds, Users } = require('../models.js');
-const { client } = require('./index.js');
 const axios = require('axios');
 require('dotenv').config();
 const path = require('path');
@@ -14,7 +13,7 @@ async function isBotOnline() {
 	return true;
 }
 
-function createServer() {
+function createServer(client) {
 	const app = express();
 
 	const PORT = process.env.PORT || 3000
@@ -221,7 +220,7 @@ function createServer() {
             res.json(leaderboardWithProfiles);
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
-            res.status(500).json({ error: 'Failed to fetch leaderboard' });
+            res.status(500).json({ error: error.message });
         }
     });
 
