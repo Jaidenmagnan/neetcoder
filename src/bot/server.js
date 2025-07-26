@@ -10,7 +10,6 @@ const express = require('express');
 
 require('dotenv').config();
 
-
 async function isBotOnline() {
     return true;
 }
@@ -32,8 +31,8 @@ function createServer(client) {
         app.use(express.static(buildPath));
     }
 
-	authRoutes(app);
-	guildRoutes(app, client);
+    authRoutes(app);
+    guildRoutes(app, client);
 
     app.get('/api/bot-status', async (_, res) => {
         const isOnline = await isBotOnline();
@@ -45,8 +44,6 @@ function createServer(client) {
         });
     });
 
-    
-    
     if (process.env.NODE_ENV === 'production') {
         app.get('/{*any}', (_, res) => {
             res.sendFile(path.resolve(buildPath, 'index.html'));

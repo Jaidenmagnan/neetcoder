@@ -3,9 +3,9 @@ const { sign } = require('jsonwebtoken');
 const axios = require('axios');
 
 function authRoutes(app) {
-	app.get('/api/user/me', (req, res) => {
-		res.json(req.user);
-	});
+    app.get('/api/user/me', (req, res) => {
+        res.json(req.user);
+    });
 
     app.get('/auth/sign-out', (req, res) => {
         res.clearCookie('token');
