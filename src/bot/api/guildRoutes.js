@@ -65,18 +65,14 @@ function guildRoutes(app, client) {
                     .json({ error: 'Guild not found in bot cache' });
             }
 
+			if (!guild.members.cache.size || guild.members.cache.size < guild.memberCount) {
+				await guild.members.fetch(); 
+			}
+
             // Get user profiles from the guild's member cache
             const leaderboardWithProfiles = await Promise.all(
                 leaderboard.map(async (user) => {
                     let member = guild.members.cache.get(user.userid);
-                    // If not cached, try to fetch from Discord
-                    if (!member) {
-                        try {
-                            member = await guild.members.fetch(user.userid);
-                        } catch {
-                            member = null;
-                        }
-                    }
                     return {
                         ...user.toJSON(),
                         profile: member
