@@ -37,5 +37,10 @@ module.exports = {
         await interaction.channel.send({
             embeds: [embed],
         });
+
+		await interaction.reply({
+			content: "ragebait successful",
+			flags: MessageFlags.Ephemeral,
+		})
     },
 };
