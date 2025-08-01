@@ -50,7 +50,7 @@ async function addCrown(avaURL) {
     const { body } = await request(avaURL);
     const avatar = await Canvas.loadImage(await body.arrayBuffer());
     // crown = 100 by 58
-    const crown = await Canvas.loadImage('../../../client/public/assets/crown.png');
+    const crown = await Canvas.loadImage('./src/bot/assets/crown.png');
 
     context.drawImage(avatar, 0, 0, canvas.width, canvas.height);
     context.drawImage(crown, 30, 5, 69, 40);
