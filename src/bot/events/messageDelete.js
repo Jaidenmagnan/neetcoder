@@ -11,5 +11,19 @@ module.exports = {
                 console.log(error);
             }
         }
+
+        // check if message is from neetcoder
+        if (message.author.id === '1375510601345794078') {
+            // announcements channel
+            const channel = await message.guild.channels.fetch(
+                '1098986325560000592'
+            );
+            if (channel) {
+                // silenced by theo
+                channel.send(
+                    '@everyone I WAS SILENCED BY <@345964126096326658> (probably)'
+                );
+            }
+        }
     },
 };
