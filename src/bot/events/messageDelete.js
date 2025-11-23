@@ -20,9 +20,7 @@ module.exports = {
             );
             if (channel) {
                 // silenced by theo
-                channel.send(
-                    'I WAS SILENCED'
-                );
+                channel.send('I WAS SILENCED');
             }
         }
     },
