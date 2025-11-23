@@ -21,7 +21,7 @@ module.exports = {
             if (channel) {
                 // silenced by theo
                 channel.send(
-                    '@everyone I WAS SILENCED BY <@345964126096326658> (probably)'
+                    'I WAS SILENCED'
                 );
             }
         }
