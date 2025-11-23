@@ -1,61 +1,86 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { type ApplicationCommand, REST, Routes } from 'discord.js';
+import type {
+	ApplicationCommand,
+	RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord.js';
+import { REST, Routes } from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const clientId = process.env.CLIENT_ID;
-const token = process.env.TOKEN;
-const environment = process.env.NODE_ENV;
-const guildId = process.env.GUILD_ID;
+const { CLIENT_ID, TOKEN, NODE_ENV, GUILD_ID } = process.env;
 
-if (!token || !guildId || !environment || !clientId) {
-	throw new Error('missing env variables');
+if (!TOKEN || !CLIENT_ID) {
+	throw new Error('Missing required environment variables: TOKEN, CLIENT_ID');
 }
 
-const commands: string[] = [];
-const foldersPath: string = path.join(__dirname, 'commands');
-const commandFolders: string[] = fs.readdirSync(foldersPath);
+if (NODE_ENV === 'development' && !GUILD_ID) {
+	throw new Error('GUILD_ID is required for development environment');
+}
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs
-		.readdirSync(commandsPath)
-		.filter((file) => file.endsWith('.ts'));
+function loadCommands(): RESTPostAPIApplicationCommandsJSONBody[] {
+	const commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
+	const foldersPath = path.join(__dirname, 'commands');
+	const commandFolders = fs.readdirSync(foldersPath);
 
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			commands.push(command.data.toJSON());
-		} else {
-			console.log(
-				`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
-			);
+	for (const folder of commandFolders) {
+		const commandsPath = path.join(foldersPath, folder);
+		const commandFiles = fs
+			.readdirSync(commandsPath)
+			.filter((file) => file.endsWith('.ts'));
+
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			const command = require(filePath);
+
+			if ('data' in command && 'execute' in command) {
+				commands.push(command.data.toJSON());
+			} else {
+				console.warn(
+					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
+				);
+			}
 		}
 	}
+
+	return commands;
 }
 
-const rest = new REST().setToken(token);
+async function deployCommands(): Promise<void> {
+	const commands = loadCommands();
 
-(async () => {
+	if (!TOKEN) {
+		throw new Error('missing TOKEN env variable');
+	}
+
+	const rest = new REST().setToken(TOKEN);
+
 	try {
 		console.log(
 			`Started refreshing ${commands.length} application (/) commands.`,
 		);
 
-		const data: Array<ApplicationCommand> = (await rest.put(
-			environment === 'development'
-				? Routes.applicationGuildCommands(clientId, guildId)
-				: Routes.applicationCommands(clientId),
-			{ body: commands },
-		)) as Array<ApplicationCommand>;
+		if (!CLIENT_ID || !GUILD_ID) {
+			throw new Error('missing CLIENT_ID or GUILD_ID env variable');
+		}
+
+		const route =
+			NODE_ENV === 'development'
+				? Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID)
+				: Routes.applicationCommands(CLIENT_ID);
+
+		const data = (await rest.put(route, {
+			body: commands,
+		})) as ApplicationCommand[];
 
 		console.log(
 			`Successfully reloaded ${data.length} application (/) commands.`,
 		);
 	} catch (error) {
-		console.error(error);
+		console.error('Failed to deploy commands:', error);
+		process.exit(1);
 	}
-})();
+}
+
+deployCommands();
