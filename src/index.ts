@@ -21,7 +21,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection<string, Command>();
 
 function loadCommands(): void {
-	const foldersPath = path.join(__dirname, 'commands');
+	const foldersPath = path.join(__dirname, 'bot/commands');
 	const commandFolders = fs.readdirSync(foldersPath);
 
 	for (const folder of commandFolders) {
@@ -46,7 +46,7 @@ function loadCommands(): void {
 }
 
 function loadEvents(): void {
-	const eventsPath = path.join(__dirname, 'events');
+	const eventsPath = path.join(__dirname, 'bot/events');
 	const eventFiles = fs
 		.readdirSync(eventsPath)
 		.filter((file) => file.endsWith('.ts'));

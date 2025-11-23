@@ -1,6 +1,5 @@
-import { pgTable, integer } from "drizzle-orm/pg-core"
+import { integer, pgTable } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-    id: integer(),
-
+	id: integer(),
 });

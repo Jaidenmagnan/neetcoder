@@ -21,7 +21,7 @@ if (NODE_ENV === 'development' && !GUILD_ID) {
 
 function loadCommands(): RESTPostAPIApplicationCommandsJSONBody[] {
 	const commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
-	const foldersPath = path.join(__dirname, 'commands');
+	const foldersPath = path.join(__dirname, 'bot/commands');
 	const commandFolders = fs.readdirSync(foldersPath);
 
 	for (const folder of commandFolders) {
