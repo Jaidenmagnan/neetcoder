@@ -1,0 +1,49 @@
+{
+  "name": "neetcoder",
+  "module": "index.js",
+  "type": "commonjs",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "eslint": "^9.27.0"
+  },
+  "scripts": {
+    "start:bot": "node src/bot/index.js",
+    "start:client": "cd src/client && npm run dev",
+    "deploy-commands": "node deploy-commands.js",
+    "start": "npm run heroku-postbuild && concurrently \"npm run start:bot\"  \"npm run start:client\"",
+    "dev": "concurrently \"npm run start:bot\" \"npm run start:client\"",
+    "heroku-postbuild": "cd src/client && npm install && npm run build",
+    "lint": "eslint . --ext .js,.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@balldontlie/sdk": "^1.2.2",
+    "@napi-rs/canvas": "^0.1.70",
+    "@tailwindcss/postcss": "^4.1.10",
+    "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
+    "concurrently": "^9.1.2",
+    "cookie-parser": "^1.4.7",
+    "cookies-parser": "^1.2.0",
+    "cors": "^2.8.5",
+    "ctx": "^0.3.0",
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.1.0",
+    "pg": "^8.16.0",
+    "pg-hstore": "^2.3.4",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7",
+    "tailwindcss": "^4.1.10",
+    "turndown": "^7.2.0",
+    "undici": "^7.10.0"
+  }
+}
