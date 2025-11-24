@@ -1,4 +1,4 @@
-import type { User } from 'discord.js';
+import type { GuildMember } from 'discord.js';
 import {
 	type CommandInteraction,
 	EmbedBuilder,
@@ -11,24 +11,23 @@ export const data: SlashCommandBuilder = new SlashCommandBuilder()
 	.setDescription('Replies with the user name');
 
 export async function execute(interaction: CommandInteraction) {
+	const guildMember: GuildMember = interaction.member as GuildMember;
+
 	await interaction.deferReply();
 	const levelService = new LevelService();
 
 	const level = await levelService.getLevel(
-		interaction.user.id,
-		interaction.guild?.id,
+		guildMember.user.id,
+		guildMember.guild.id,
 	);
 
-	const discordUser: User = await interaction.client.users.fetch(
-		interaction.user.id,
-	);
-	const level_card: EmbedBuilder = new EmbedBuilder()
+	const levelCard: EmbedBuilder = new EmbedBuilder()
 		.setAuthor({
-			name: discordUser.displayName,
-			iconURL: discordUser.displayAvatarURL(),
+			name: guildMember.user.displayName,
+			iconURL: guildMember.user.displayAvatarURL(),
 		})
 		.setDescription(`** AURA LEVEL ${level}**`)
 		.setTimestamp();
 
-	await interaction.editReply({ embeds: [level_card] });
+	await interaction.editReply({ embeds: [levelCard] });
 }
