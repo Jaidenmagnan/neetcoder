@@ -3,6 +3,7 @@ import { guilds } from './guilds';
 import { users } from './users';
 
 export const members = pgTable('members', {
+	id: serial('id').primaryKey().notNull(),
 	userId: serial('user_id')
 		.notNull()
 		.references(() => users.id),

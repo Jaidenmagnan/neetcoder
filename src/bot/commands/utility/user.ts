@@ -1,15 +1,20 @@
 import { type CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { UserRepository } from '../../../db/repositories/userRepository';
-import type { User } from '../../../types/user';
+import { MemberRepository } from '../../../db/repositories/memberRepository';
+import type { Member } from '../../../types/member';
 
 export const data: SlashCommandBuilder = new SlashCommandBuilder()
 	.setName('user')
 	.setDescription('Replies with the user name');
 
 export async function execute(interaction: CommandInteraction) {
-	const userRepository = new UserRepository();
-	const user: User = await userRepository.findOneOrCreateByDiscordId(
-		interaction.user.id,
+	const memberRepository = new MemberRepository();
+
+	const discordGuildId = interaction.guildId;
+	const discordUserId = interaction.user.id;
+
+	const member: Member = await memberRepository.findOneOrCreateByDiscordIds(
+		discordUserId as string,
+		discordGuildId as string,
 	);
-	return interaction.reply({ content: user.discordUserId });
+	return interaction.reply({ content: member.id.toString() });
 }

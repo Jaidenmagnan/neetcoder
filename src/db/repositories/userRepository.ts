@@ -14,19 +14,19 @@ export class UserRepository {
 		return user;
 	}
 
-	async findOneByDiscordId(discordId: string): Promise<User | undefined> {
+	async findOneByDiscordId(discordUserId: string): Promise<User | undefined> {
 		return db.query.users.findFirst({
-			where: eq(users.discordUserId, discordId),
+			where: eq(users.discordUserId, discordUserId),
 		});
 	}
 
 	async insert(discordUserId: string): Promise<User> {
-		const user: User[] = db
+		const user: User[] = (await db
 			.insert(users)
 			.values({
 				discordUserId: discordUserId,
 			})
-			.returning() as unknown as User[];
+			.returning()) as unknown as User[];
 
 		return user[0];
 	}
