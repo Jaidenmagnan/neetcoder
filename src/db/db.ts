@@ -1,6 +1,8 @@
-import { drizzle } from 'drizzle-orm/singlestore/driver';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import * as guilds from './schema/guilds';
+import * as members from './schema/members';
+import * as users from './schema/users';
 
-const _db = drizzle({
-	connection: process.env.DATABASE_URL,
-	casing: 'snake_case',
+export const db = drizzle(process.env.DB_URL, {
+	schema: { ...users, ...guilds, ...members },
 });
