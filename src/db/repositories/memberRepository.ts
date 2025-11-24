@@ -1,6 +1,9 @@
+import { and, eq } from 'drizzle-orm';
 import type { Member } from '../../types/member';
 import { db } from '../db';
+import { guilds } from '../schema/guilds';
 import { members } from '../schema/members';
+import { users } from '../schema/users';
 import { GuildRepository } from './guildRepository';
 import { UserRepository } from './userRepository';
 
@@ -12,42 +15,78 @@ export class MemberRepository {
 		this.userRepository = new UserRepository();
 		this.guildRepository = new GuildRepository();
 	}
+
+	async update(member: Member): Promise<Member> {
+		await db
+			.update(members)
+			.set({ messageCount: member.messageCount })
+			.where(eq(members.id, member.id));
+
+		return member;
+	}
+
+	async ensureMember(
+		discordUserId: string,
+		discordGuildId: string | undefined,
+	): Promise<Member> {
+		if (!discordGuildId) {
+			throw 'the guild is empty';
+		}
+
+		return await this.findOneOrCreateByDiscordIds(
+			discordUserId,
+			discordGuildId,
+		);
+	}
+
 	async findOneOrCreateByDiscordIds(
 		discordUserId: string,
 		discordGuildId: string,
 	) {
+		let member = await this.findMemberByDiscordIds(
+			discordUserId,
+			discordGuildId,
+		);
+
+		if (!member) {
+			member = await this.insert(discordUserId, discordGuildId);
+		}
+
+		return member;
+	}
+
+	async insert(discordUserId: string, discordGuildId: string): Promise<Member> {
 		const user =
 			await this.userRepository.findOneOrCreateByDiscordId(discordUserId);
 		const guild =
 			await this.guildRepository.findOneOrCreateByDiscordId(discordGuildId);
 
-		let member = await this.findMemberByIds(user.id, guild.id);
-
-		if (!member) {
-			member = await this.insert(user.id, guild.id);
-		}
-
-		return member;
-	}
-	async insert(userId: number, guildId: number): Promise<Member> {
-		const member: Member[] = (await db
+		return await db
 			.insert(members)
 			.values({
-				userId: userId,
-				guildId: guildId,
+				userId: user.id,
+				guildId: guild.id,
+				messageCount: 0,
 			})
-			.returning()) as unknown as Member[];
-
-		return member[0];
+			.returning()
+			.then((result) => result[0]);
 	}
 
-	async findMemberByIds(
-		userId: number,
-		guildId: number,
+	async findMemberByDiscordIds(
+		discordUserId: string,
+		discordGuildId: string,
 	): Promise<Member | undefined> {
-		return db.query.members.findFirst({
-			where: (fields, { eq, and }) =>
-				and(eq(fields.userId, userId), eq(fields.guildId, guildId)),
-		});
+		return await db
+			.select({ member: members })
+			.from(members)
+			.innerJoin(users, eq(members.userId, users.id))
+			.innerJoin(guilds, eq(members.guildId, guilds.id))
+			.where(
+				and(
+					eq(users.discordUserId, discordUserId),
+					eq(guilds.discordGuildId, discordGuildId),
+				),
+			)
+			.then((result) => result[0]?.member);
 	}
 }

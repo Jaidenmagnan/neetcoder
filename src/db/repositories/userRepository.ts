@@ -21,13 +21,12 @@ export class UserRepository {
 	}
 
 	async insert(discordUserId: string): Promise<User> {
-		const user: User[] = (await db
+		return await db
 			.insert(users)
 			.values({
 				discordUserId: discordUserId,
 			})
-			.returning()) as unknown as User[];
-
-		return user[0];
+			.returning()
+			.then((result) => result[0]);
 	}
 }

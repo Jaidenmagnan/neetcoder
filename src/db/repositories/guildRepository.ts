@@ -21,13 +21,12 @@ export class GuildRepository {
 	}
 
 	async insert(discordGuildId: string): Promise<Guild> {
-		const guild: Guild[] = (await db
+		return await db
 			.insert(guilds)
 			.values({
 				discordGuildId: discordGuildId,
 			})
-			.returning()) as unknown as Guild[];
-
-		return guild[0];
+			.returning()
+			.then((result) => result[0]);
 	}
 }
