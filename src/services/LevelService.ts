@@ -1,37 +1,17 @@
 import { MemberRepository } from '../db/repositories/memberRepository';
 import type { Member } from '../types/member';
 
+const memberRepository = new MemberRepository();
+
 export class LevelService {
-	async getLevel(
-		discordUserId: string,
-		discordGuildId: string | undefined,
-	): Promise<number> {
-		const memberRepository = new MemberRepository();
-
-		const member: Member = await memberRepository.ensureMember(
-			discordUserId,
-			discordGuildId,
-		);
-
+	async getLevel(member: Member): Promise<number> {
 		return this.calculateLevel(member.messageCount);
 	}
 
-	async incrementLevel(
-		discordUserId: string,
-		discordGuildId: string | undefined,
-	): Promise<Member> {
-		const memberRepository = new MemberRepository();
-
-		const member: Member = await memberRepository.ensureMember(
-			discordUserId,
-			discordGuildId,
-		);
-
+	async incrementMessageCount(member: Member): Promise<Member> {
 		member.messageCount += 1;
 
-		await memberRepository.update(member);
-
-		return member;
+		return await memberRepository.update(member);
 	}
 
 	private calculateLevel(messageCount: number): number {

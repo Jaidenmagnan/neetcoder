@@ -17,26 +17,12 @@ export class MemberRepository {
 	}
 
 	async update(member: Member): Promise<Member> {
-		await db
+		return await db
 			.update(members)
 			.set({ messageCount: member.messageCount })
-			.where(eq(members.id, member.id));
-
-		return member;
-	}
-
-	async ensureMember(
-		discordUserId: string,
-		discordGuildId: string | undefined,
-	): Promise<Member> {
-		if (!discordGuildId) {
-			throw 'the guild is empty';
-		}
-
-		return await this.findOneOrCreateByDiscordIds(
-			discordUserId,
-			discordGuildId,
-		);
+			.where(eq(members.id, member.id))
+			.returning()
+			.then((result) => result[0]);
 	}
 
 	async findOneOrCreateByDiscordIds(

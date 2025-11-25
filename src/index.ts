@@ -17,7 +17,13 @@ interface Command {
 	execute: (interaction: Interaction) => Promise<void>;
 }
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMessages,
+	],
+});
 client.commands = new Collection<string, Command>();
 
 function loadCommands(): void {
