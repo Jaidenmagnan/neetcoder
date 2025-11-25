@@ -14,6 +14,12 @@ export class GuildRepository {
 		return guild;
 	}
 
+	async find(id: number): Promise<Guild | undefined> {
+		return db.query.guilds.findFirst({
+			where: eq(guilds.id, id),
+		});
+	}
+
 	async findOneByDiscordId(discordGuildId: string): Promise<Guild | undefined> {
 		return db.query.guilds.findFirst({
 			where: eq(guilds.discordGuildId, discordGuildId),

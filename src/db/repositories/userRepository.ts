@@ -20,6 +20,12 @@ export class UserRepository {
 		});
 	}
 
+	async find(id: number): Promise<User | undefined> {
+		return db.query.users.findFirst({
+			where: eq(users.id, id),
+		});
+	}
+
 	async insert(discordUserId: string): Promise<User> {
 		return await db
 			.insert(users)

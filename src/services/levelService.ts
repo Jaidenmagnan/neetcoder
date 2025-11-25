@@ -14,6 +14,10 @@ export class LevelService {
 		return await memberRepository.update(member);
 	}
 
+	async getLeaderboard(guildId: number, limit: number): Promise<Member[]> {
+		return await memberRepository.findAllByGuildId(guildId, limit);
+	}
+
 	private calculateLevel(messageCount: number): number {
 		if (messageCount < 10) {
 			return 1;
