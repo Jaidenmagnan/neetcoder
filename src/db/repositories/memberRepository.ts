@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { Member } from '../../types/member';
 import { db } from '../db';
 import { guilds } from '../schema/guilds';
@@ -23,6 +23,15 @@ export class MemberRepository {
 			.where(eq(members.id, member.id))
 			.returning()
 			.then((result) => result[0]);
+	}
+
+	async findAllByGuildId(guildId: number, limit: number): Promise<Member[]> {
+		return await db
+			.select()
+			.from(members)
+			.where(eq(members.guildId, guildId))
+			.orderBy(desc(members.messageCount))
+			.limit(limit);
 	}
 
 	async findOneOrCreateByDiscordIds(

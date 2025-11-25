@@ -4,8 +4,8 @@ import {
 	EmbedBuilder,
 	SlashCommandBuilder,
 } from 'discord.js';
-import { LevelService } from '../../../services/LevelService';
-import { MemberService } from '../../../services/MemberService';
+import { LevelService } from '../../../services/levelService';
+import { MemberService } from '../../../services/memberService';
 
 const levelService = new LevelService();
 const memberService = new MemberService();
