@@ -4,10 +4,10 @@ import { users } from './users';
 
 export const members = pgTable('members', {
 	id: serial('id').primaryKey().notNull(),
-	userId: serial('user_id')
+	userId: integer('user_id')
 		.notNull()
 		.references(() => users.id),
-	guildId: serial('guild_id')
+	guildId: integer('guild_id')
 		.notNull()
 		.references(() => guilds.id),
 	messageCount: integer('message_count').default(0).notNull(),
