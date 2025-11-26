@@ -1,20 +1,17 @@
 import { and, desc, eq } from 'drizzle-orm';
+import { db } from '../../db/db';
 import type { Member } from '../../types/member';
-import { db } from '../db';
 import { guilds } from '../schema/guilds';
 import { members } from '../schema/members';
 import { users } from '../schema/users';
-import { GuildRepository } from './guildRepository';
-import { UserRepository } from './userRepository';
+import type { GuildRepository } from './guildRepository';
+import type { UserRepository } from './userRepository';
 
 export class MemberRepository {
-	private userRepository: UserRepository;
-	private guildRepository: GuildRepository;
-
-	constructor() {
-		this.userRepository = new UserRepository();
-		this.guildRepository = new GuildRepository();
-	}
+	constructor(
+		private userRepository: UserRepository,
+		private guildRepository: GuildRepository,
+	) {}
 
 	async update(member: Member): Promise<Member> {
 		return await db

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
+import { db } from '../../db/db';
 import type { Guild } from '../../types/guild';
-import { db } from '../db';
 import { guilds } from '../schema/guilds';
 
 export class GuildRepository {

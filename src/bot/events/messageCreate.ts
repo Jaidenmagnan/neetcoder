@@ -4,11 +4,7 @@ import {
 	type Message,
 	type TextChannel,
 } from 'discord.js';
-import { LevelService } from '../../services/levelService';
-import { MemberService } from '../../services/memberService';
-
-const levelService = new LevelService();
-const memberService = new MemberService();
+import { levelService, memberService } from '../../di/container';
 
 module.exports = {
 	name: Events.MessageCreate,

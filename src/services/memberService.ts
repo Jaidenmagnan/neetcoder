@@ -1,8 +1,12 @@
-import { MemberRepository } from '../db/repositories/memberRepository';
+import type { MemberRepository } from '../db/repositories/memberRepository';
 
 export class MemberService {
+	constructor(private memberRepository: MemberRepository) {}
+
 	async ensureMember(discordId: string, guildId: string) {
-		const memberRepository = new MemberRepository();
-		return memberRepository.findOneOrCreateByDiscordIds(discordId, guildId);
+		return this.memberRepository.findOneOrCreateByDiscordIds(
+			discordId,
+			guildId,
+		);
 	}
 }
