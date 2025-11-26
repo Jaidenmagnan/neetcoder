@@ -35,10 +35,7 @@ export class MemberRepository {
 		discordUserId: string,
 		discordGuildId: string,
 	) {
-		let member = await this.findMemberByDiscordIds(
-			discordUserId,
-			discordGuildId,
-		);
+		let member = await this.findByDiscordIds(discordUserId, discordGuildId);
 
 		if (!member) {
 			member = await this.insert(discordUserId, discordGuildId);
@@ -64,7 +61,7 @@ export class MemberRepository {
 			.then((result) => result[0]);
 	}
 
-	async findMemberByDiscordIds(
+	async findByDiscordIds(
 		discordUserId: string,
 		discordGuildId: string,
 	): Promise<Member | undefined> {
