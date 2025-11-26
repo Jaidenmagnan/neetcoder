@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
+import { db } from '../../db/db';
 import type { User } from '../../types/user';
-import { db } from '../db';
 import { users } from '../schema/users';
 
 export class UserRepository {
@@ -20,7 +20,13 @@ export class UserRepository {
 		});
 	}
 
-	async find(id: number): Promise<User | undefined> {
+	async find(id: number | number[]): Promise<User | User[] | undefined> {
+		if (Array.isArray(id)) {
+			return db.query.users.findMany({
+				where: inArray(users.id, id),
+			});
+		}
+
 		return db.query.users.findFirst({
 			where: eq(users.id, id),
 		});

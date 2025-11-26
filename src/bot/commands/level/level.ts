@@ -1,21 +1,23 @@
-import type { GuildMember } from 'discord.js';
-import {
-	type CommandInteraction,
-	EmbedBuilder,
-	SlashCommandBuilder,
-} from 'discord.js';
-import { LevelService } from '../../../services/levelService';
-import { MemberService } from '../../../services/memberService';
+import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { levelService, memberService } from '../../../di/container';
 
-const levelService = new LevelService();
-const memberService = new MemberService();
-
-export const data: SlashCommandBuilder = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
 	.setName('level')
-	.setDescription('Replies with the user name');
+	.setDescription('Replies with the user name')
 
-export async function execute(interaction: CommandInteraction) {
-	const guildMember: GuildMember = interaction.member as GuildMember;
+	.addUserOption((option) =>
+		option
+			.setName('user')
+			.setDescription('The user to get the level of')
+			.setRequired(false),
+	);
+
+export async function execute(
+	interaction: ChatInputCommandInteraction,
+): Promise<void> {
+	const guildMember: GuildMember = (interaction.options.getMember('user') ??
+		interaction.member) as GuildMember;
 
 	await interaction.deferReply();
 

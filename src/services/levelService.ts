@@ -1,9 +1,9 @@
-import { MemberRepository } from '../db/repositories/memberRepository';
+import type { MemberRepository } from '../db/repositories/memberRepository';
 import type { Member } from '../types/member';
 
-const memberRepository = new MemberRepository();
-
 export class LevelService {
+	constructor(private memberRepository: MemberRepository) {}
+
 	async getLevel(member: Member): Promise<number> {
 		return this.calculateLevel(member.messageCount);
 	}
@@ -11,11 +11,11 @@ export class LevelService {
 	async incrementMessageCount(member: Member): Promise<Member> {
 		member.messageCount += 1;
 
-		return await memberRepository.update(member);
+		return await this.memberRepository.update(member);
 	}
 
 	async getLeaderboard(guildId: number, limit: number): Promise<Member[]> {
-		return await memberRepository.findAllByGuildId(guildId, limit);
+		return await this.memberRepository.findAllByGuildId(guildId, limit);
 	}
 
 	private calculateLevel(messageCount: number): number {

@@ -1,8 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { Interaction, SlashCommandBuilder } from 'discord.js';
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { Collection } from 'discord.js';
 import * as dotenv from 'dotenv';
+import { client, startClient } from './di/container';
 
 dotenv.config();
 
@@ -16,14 +17,6 @@ interface Command {
 	data: SlashCommandBuilder;
 	execute: (interaction: Interaction) => Promise<void>;
 }
-
-export const client = new Client({
-	intents: [
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildMessages,
-	],
-});
 
 client.commands = new Collection<string, Command>();
 
@@ -72,4 +65,4 @@ function loadEvents(): void {
 
 loadCommands();
 loadEvents();
-client.login(process.env.TOKEN);
+startClient();
