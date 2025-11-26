@@ -20,6 +20,16 @@ export class GuildRepository {
 		});
 	}
 
+	async update(guild: Guild): Promise<void> {
+		await db
+			.update(guilds)
+			.set({
+				discordGuildId: guild.discordGuildId,
+				welcomeChannelId: guild.welcomeChannelId,
+			})
+			.where(eq(guilds.id, guild.id));
+	}
+
 	async findOneByDiscordId(discordGuildId: string): Promise<Guild | undefined> {
 		return db.query.guilds.findFirst({
 			where: eq(guilds.discordGuildId, discordGuildId),

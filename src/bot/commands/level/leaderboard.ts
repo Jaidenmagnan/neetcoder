@@ -1,5 +1,5 @@
 import {
-	type CommandInteraction,
+	type ChatInputCommandInteraction,
 	EmbedBuilder,
 	type GuildMember,
 	SlashCommandBuilder,
@@ -15,7 +15,9 @@ export const data: SlashCommandBuilder = new SlashCommandBuilder()
 	.setName('leaderboard')
 	.setDescription('Displays the level leaderboard for the server');
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(
+	interaction: ChatInputCommandInteraction,
+): Promise<void> {
 	await interaction.deferReply();
 
 	const guildMember = interaction.member as GuildMember;
