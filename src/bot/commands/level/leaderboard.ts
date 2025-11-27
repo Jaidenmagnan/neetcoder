@@ -5,7 +5,7 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 import {
-	discordService,
+	discordAdapter,
 	levelService,
 	memberService,
 } from '../../../di/container';
@@ -39,8 +39,8 @@ export async function execute(
 
 	await Promise.all(
 		leaderboard.map(async (member, i) => {
-			const discordMember: GuildMember = await discordService
-				.getDiscordGuildMembers(member.guildId, [member.userId])
+			const discordMember: GuildMember = await discordAdapter
+				.getDiscordGuildMembers([member])
 				.then((members) => members[0]);
 
 			const level: number = await levelService.getLevel(member);
