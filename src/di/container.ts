@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits } from 'discord.js';
+import { DiscordAdapter } from '../adapters/discordAdapter';
 import { ChannelRepository } from '../db/repositories/channelRepository';
 import { GuildRepository } from '../db/repositories/guildRepository';
 import { MemberRepository } from '../db/repositories/memberRepository';
 import { UserRepository } from '../db/repositories/userRepository';
 import { ChannelService } from '../services/channelService';
-import { DiscordService } from '../services/discordService';
 import { LevelService } from '../services/levelService';
 import { MemberService } from '../services/memberService';
 import { WelcomeLogService } from '../services/welcomeLogService';
@@ -15,6 +15,7 @@ export const client = new Client({
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMembers,
 	],
 });
 
@@ -29,17 +30,23 @@ export const memberRepository = new MemberRepository(
 
 export const channelRepository = new ChannelRepository(guildRepository);
 
-// services
-export const discordService = new DiscordService(
+// adapters
+export const discordAdapter = new DiscordAdapter(
 	client,
 	userRepository,
 	guildRepository,
 );
 
+// services
 export const levelService = new LevelService(memberRepository);
 export const memberService = new MemberService(memberRepository);
 export const channelService = new ChannelService(channelRepository);
-export const welcomeLogService = new WelcomeLogService(guildRepository);
+
+export const welcomeLogService = new WelcomeLogService(
+	guildRepository,
+	channelRepository,
+	discordAdapter,
+);
 
 export async function startClient() {
 	client.login(process.env.TOKEN).catch((err) => {
