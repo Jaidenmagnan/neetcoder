@@ -1,9 +1,13 @@
+import type { ChannelRepository } from '../db/repositories/channelRepository';
 import type { GuildRepository } from '../db/repositories/guildRepository';
-import { channelRepository } from '../di/container';
 import type { Channel } from '../types/channel';
+import type { Member } from '../types/member';
 
 export class WelcomeLogService {
-	constructor(private guildRepository: GuildRepository) {}
+	constructor(
+		private guildRepository: GuildRepository,
+		private channelRepository: ChannelRepository,
+	) {}
 
 	async setChannel(channel: Channel): Promise<Channel> {
 		const guild = await this.guildRepository.find(channel.guildId);
@@ -19,13 +23,13 @@ export class WelcomeLogService {
 		return channel;
 	}
 
-	async getWelcomeLogChannel(guildId: number): Promise<Channel | undefined> {
-		const guild = await this.guildRepository.find(guildId);
+	async getChannel(member: Member): Promise<Channel | undefined> {
+		const guild = await this.guildRepository.find(member.guildId);
 
 		if (!guild || !guild.welcomeChannelId) {
 			return undefined;
 		}
 
-		return channelRepository.find(guild.welcomeChannelId);
+		return await this.channelRepository.find(guild.welcomeChannelId);
 	}
 }
