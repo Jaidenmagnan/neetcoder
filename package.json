@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "release": "npm run migrate",
-    "postbuild": "npm run deploy-commands",
+    "postbuild": "node dist/deploy-commands.js",
     "migrate": "npx drizzle-kit migrate",
     "deploy-commands": "tsx src/deploy-commands.ts",
     "format:check": "npx @biomejs/biome check",
