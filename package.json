@@ -11,7 +11,7 @@
     "start": "node dist/index.js",
     "release": "npm run migrate",
     "postbuild": "node dist/deploy-commands.js",
-    "migrate": "npx drizzle-kit migrate",
+    "migrate": "drizzle-kit migrate",
     "deploy-commands": "tsx src/deploy-commands.ts",
     "format:check": "npx @biomejs/biome check",
     "format:write": "npx @biomejs/biome check --write",
