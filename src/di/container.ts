@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits } from 'discord.js';
-import { DiscordAdapter } from '../adapters/discordAdapter';
+import { DiscordChannelAdapter } from '../adapters/Discord/discordChannelAdapter';
+import { DiscordGuildAdapter } from '../adapters/Discord/discordGuildAdapter';
 import { ChannelRepository } from '../db/repositories/channelRepository';
 import { GuildRepository } from '../db/repositories/guildRepository';
 import { MemberRepository } from '../db/repositories/memberRepository';
@@ -31,7 +32,12 @@ export const memberRepository = new MemberRepository(
 export const channelRepository = new ChannelRepository(guildRepository);
 
 // adapters
-export const discordAdapter = new DiscordAdapter(
+export const discordChannelAdapter = new DiscordChannelAdapter(
+	client,
+	guildRepository,
+);
+
+export const discordGuildAdapter = new DiscordGuildAdapter(
 	client,
 	userRepository,
 	guildRepository,
@@ -45,7 +51,6 @@ export const channelService = new ChannelService(channelRepository);
 export const welcomeLogService = new WelcomeLogService(
 	guildRepository,
 	channelRepository,
-	discordAdapter,
 );
 
 export async function startClient() {

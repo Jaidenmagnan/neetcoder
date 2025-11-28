@@ -1,4 +1,3 @@
-import type { DiscordAdapter } from '../adapters/discordAdapter';
 import type { ChannelRepository } from '../db/repositories/channelRepository';
 import type { GuildRepository } from '../db/repositories/guildRepository';
 import type { Channel } from '../types/channel';
@@ -8,7 +7,6 @@ export class WelcomeLogService {
 	constructor(
 		private guildRepository: GuildRepository,
 		private channelRepository: ChannelRepository,
-		private discordAdapter: DiscordAdapter,
 	) {}
 
 	async setChannel(channel: Channel): Promise<Channel> {
@@ -25,21 +23,13 @@ export class WelcomeLogService {
 		return channel;
 	}
 
-	async logWelcomeMessage(member: Member): Promise<Channel | undefined> {
+	async getChannel(member: Member): Promise<Channel | undefined> {
 		const guild = await this.guildRepository.find(member.guildId);
 
 		if (!guild || !guild.welcomeChannelId) {
 			return undefined;
 		}
 
-		const channel: Channel | undefined = await this.channelRepository.find(
-			guild.welcomeChannelId,
-		);
-
-		if (!channel) {
-			return undefined;
-		}
-
-		this.discordAdapter.logWelcomeMessage(channel, member);
+		return await this.channelRepository.find(guild.welcomeChannelId);
 	}
 }

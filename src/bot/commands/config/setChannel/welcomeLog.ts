@@ -1,6 +1,7 @@
 import type {
 	ChatInputCommandInteraction,
-	GuildMember,
+	GuildMember as DiscordGuildMember,
+	TextChannel as DiscordTextChannel,
 	SlashCommandChannelOption,
 	SlashCommandSubcommandBuilder,
 } from 'discord.js';
@@ -18,12 +19,18 @@ export const data = (subcommand: SlashCommandSubcommandBuilder) =>
 		);
 
 export const execute = async (interaction: ChatInputCommandInteraction) => {
-	const guildMember = interaction.member as GuildMember;
-	const channelOption = interaction.options.getChannel('channel');
+	const guildMember = interaction.member as DiscordGuildMember;
+	const channelOption: DiscordTextChannel | null =
+		interaction.options.getChannel('channel');
 
 	// note: this should never run because we set required to true, but its needed for dumb ah ts
 	if (!channelOption) {
 		await interaction.reply('Channel option is required.');
+		return;
+	}
+
+	if (channelOption.isTextBased() === false) {
+		await interaction.reply('Please select a text-based channel.');
 		return;
 	}
 
