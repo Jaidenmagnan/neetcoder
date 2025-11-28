@@ -61,6 +61,14 @@ async function deployCommands(): Promise<void> {
 			`Started refreshing ${commands.length} application (/) commands.`,
 		);
 
+		console.log('Clearing all global commands...');
+
+		await rest.put(Routes.applicationCommands(CLIENT_ID ?? ''), {
+			body: [],
+		});
+
+		console.log('Successfully cleared all global commands!');
+
 		if (!CLIENT_ID || (NODE_ENV === 'development' && !GUILD_ID)) {
 			throw new Error('missing CLIENT_ID or GUILD_ID env variable');
 		}
