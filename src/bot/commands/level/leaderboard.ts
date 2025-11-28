@@ -1,11 +1,11 @@
 import {
 	type ChatInputCommandInteraction,
+	type GuildMember as DiscordGuildMember,
 	EmbedBuilder,
-	type GuildMember,
 	SlashCommandBuilder,
 } from 'discord.js';
 import {
-	discordAdapter,
+	discordGuildAdapter,
 	levelService,
 	memberService,
 } from '../../../di/container';
@@ -20,7 +20,7 @@ export async function execute(
 ): Promise<void> {
 	await interaction.deferReply();
 
-	const guildMember = interaction.member as GuildMember;
+	const guildMember = interaction.member as DiscordGuildMember;
 
 	const member: Member = await memberService.ensureMember(
 		guildMember.user.id,
@@ -32,6 +32,9 @@ export async function execute(
 		5,
 	);
 
+	const discordMembersFromLeaderboard: DiscordGuildMember[] =
+		await discordGuildAdapter.resolve(leaderboard);
+
 	const leaderboardEmbed = new EmbedBuilder()
 		.setTitle('WHO HAS THE MOST AURA?')
 		.setColor('#B8D4F0')
@@ -39,9 +42,8 @@ export async function execute(
 
 	await Promise.all(
 		leaderboard.map(async (member, i) => {
-			const discordMember: GuildMember = await discordAdapter
-				.getDiscordGuildMembers([member])
-				.then((members) => members[0]);
+			const discordMember: DiscordGuildMember =
+				discordMembersFromLeaderboard[i];
 
 			const level: number = await levelService.getLevel(member);
 

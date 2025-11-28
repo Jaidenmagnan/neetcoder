@@ -19,7 +19,7 @@ import type { Channel } from '../../types/channel';
 import type { Member } from '../../types/member';
 
 module.exports = {
-	name: Events.GuildMemberAdd,
+	name: Events.GuildMemberRemove,
 	on: true,
 	async execute(discordGuildMember: DiscordGuildMember) {
 		const member: Member = await memberService.ensureMember(
@@ -40,7 +40,7 @@ module.exports = {
 
 		const components = [
 			new ContainerBuilder()
-				.setAccentColor(8902285)
+				.setAccentColor(16737095)
 				.addSectionComponents(
 					new SectionBuilder()
 						.setThumbnailAccessory(
@@ -49,7 +49,9 @@ module.exports = {
 							),
 						)
 						.addTextDisplayComponents(
-							new TextDisplayBuilder().setContent('**Welcome to neetcoders!**'),
+							new TextDisplayBuilder().setContent(
+								'**Goodbye from neetcoders!**',
+							),
 							new TextDisplayBuilder().setContent(
 								`User: \`${discordGuildMember.user.username}\``,
 							),

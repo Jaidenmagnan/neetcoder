@@ -1,6 +1,17 @@
-import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { levelService, memberService } from '../../../di/container';
+import type {
+	ChatInputCommandInteraction,
+	GuildMember as DiscordGuildMember,
+} from 'discord.js';
+import {
+	ContainerBuilder,
+	EmbedBuilder,
+	MessageFlags,
+	SectionBuilder,
+	SlashCommandBuilder,
+	TextDisplayBuilder,
+	ThumbnailBuilder,
+} from 'discord.js';
+import { client, levelService, memberService } from '../../../di/container';
 
 export const data = new SlashCommandBuilder()
 	.setName('level')
@@ -16,10 +27,9 @@ export const data = new SlashCommandBuilder()
 export async function execute(
 	interaction: ChatInputCommandInteraction,
 ): Promise<void> {
-	const guildMember: GuildMember = (interaction.options.getMember('user') ??
-		interaction.member) as GuildMember;
-
-	await interaction.deferReply();
+	const guildMember: DiscordGuildMember = (interaction.options.getMember(
+		'user',
+	) ?? interaction.member) as DiscordGuildMember;
 
 	const member = await memberService.ensureMember(
 		guildMember.user.id,
@@ -28,13 +38,26 @@ export async function execute(
 
 	const level = await levelService.getLevel(member);
 
-	const levelCard: EmbedBuilder = new EmbedBuilder()
-		.setAuthor({
-			name: guildMember.user.displayName,
-			iconURL: guildMember.user.displayAvatarURL(),
-		})
-		.setDescription(`** AURA LEVEL ${level}**`)
-		.setTimestamp();
+	const components = [
+		new ContainerBuilder().addSectionComponents(
+			new SectionBuilder()
+				.setThumbnailAccessory(
+					new ThumbnailBuilder().setURL(guildMember.user.displayAvatarURL()),
+				)
+				.addTextDisplayComponents(
+					new TextDisplayBuilder().setContent(
+						`**${guildMember.user.username}**`,
+					),
+					new TextDisplayBuilder().setContent(`AURA level: ${level}`),
+					new TextDisplayBuilder().setContent(
+						`Messages Sent: ${member.messageCount}`,
+					),
+				),
+		),
+	];
 
-	await interaction.editReply({ embeds: [levelCard] });
+	await interaction.reply({
+		flags: MessageFlags.IsComponentsV2,
+		components: components,
+	});
 }
