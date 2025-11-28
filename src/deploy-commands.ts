@@ -61,13 +61,13 @@ async function deployCommands(): Promise<void> {
 			`Started refreshing ${commands.length} application (/) commands.`,
 		);
 
-		if (!CLIENT_ID || !GUILD_ID) {
+		if (!CLIENT_ID || (NODE_ENV === 'development' && !GUILD_ID)) {
 			throw new Error('missing CLIENT_ID or GUILD_ID env variable');
 		}
 
 		const route =
 			NODE_ENV === 'development'
-				? Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID)
+				? Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID ?? '')
 				: Routes.applicationCommands(CLIENT_ID);
 
 		const data = (await rest.put(route, {
