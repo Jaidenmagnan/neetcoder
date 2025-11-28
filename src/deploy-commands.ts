@@ -11,12 +11,12 @@ dotenv.config();
 
 const { CLIENT_ID, TOKEN, NODE_ENV, GUILD_ID } = process.env;
 
-if (!TOKEN || !CLIENT_ID) {
-	throw new Error('Missing required environment variables: TOKEN, CLIENT_ID');
+if (!CLIENT_ID) {
+	throw new Error('missing CLIENT_ID env variable');
 }
 
 if (NODE_ENV === 'development' && !GUILD_ID) {
-	throw new Error('GUILD_ID is required for development environment');
+	throw new Error('GUILD_ID required for development');
 }
 
 function loadCommands(): RESTPostAPIApplicationCommandsJSONBody[] {
