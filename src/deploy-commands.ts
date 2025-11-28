@@ -11,12 +11,12 @@ dotenv.config();
 
 const { CLIENT_ID, TOKEN, NODE_ENV, GUILD_ID } = process.env;
 
-if (!TOKEN || !CLIENT_ID) {
-	throw new Error('Missing required environment variables: TOKEN, CLIENT_ID');
+if (!CLIENT_ID) {
+	throw new Error('missing CLIENT_ID env variable');
 }
 
 if (NODE_ENV === 'development' && !GUILD_ID) {
-	throw new Error('GUILD_ID is required for development environment');
+	throw new Error('GUILD_ID required for development');
 }
 
 function loadCommands(): RESTPostAPIApplicationCommandsJSONBody[] {
@@ -28,7 +28,7 @@ function loadCommands(): RESTPostAPIApplicationCommandsJSONBody[] {
 		const commandsPath = path.join(foldersPath, folder);
 		const commandFiles = fs
 			.readdirSync(commandsPath)
-			.filter((file) => file.endsWith('.ts'));
+			.filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
 
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
@@ -61,13 +61,21 @@ async function deployCommands(): Promise<void> {
 			`Started refreshing ${commands.length} application (/) commands.`,
 		);
 
-		if (!CLIENT_ID || !GUILD_ID) {
+		console.log('Clearing all global commands...');
+
+		await rest.put(Routes.applicationCommands(CLIENT_ID ?? ''), {
+			body: [],
+		});
+
+		console.log('Successfully cleared all global commands!');
+
+		if (!CLIENT_ID || (NODE_ENV === 'development' && !GUILD_ID)) {
 			throw new Error('missing CLIENT_ID or GUILD_ID env variable');
 		}
 
 		const route =
 			NODE_ENV === 'development'
-				? Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID)
+				? Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID ?? '')
 				: Routes.applicationCommands(CLIENT_ID);
 
 		const data = (await rest.put(route, {

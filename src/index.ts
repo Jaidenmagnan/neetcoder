@@ -28,7 +28,7 @@ function loadCommands(): void {
 		const commandsPath = path.join(foldersPath, folder);
 		const commandFiles = fs
 			.readdirSync(commandsPath)
-			.filter((file) => file.endsWith('.ts'));
+			.filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
 
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
@@ -49,8 +49,7 @@ function loadEvents(): void {
 	const eventsPath = path.join(__dirname, 'bot/events');
 	const eventFiles = fs
 		.readdirSync(eventsPath)
-		.filter((file) => file.endsWith('.ts'));
-
+		.filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
 	for (const file of eventFiles) {
 		const filePath = path.join(eventsPath, file);
 		const event = require(filePath);

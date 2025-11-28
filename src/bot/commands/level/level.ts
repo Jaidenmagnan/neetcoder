@@ -4,14 +4,13 @@ import type {
 } from 'discord.js';
 import {
 	ContainerBuilder,
-	EmbedBuilder,
 	MessageFlags,
 	SectionBuilder,
 	SlashCommandBuilder,
 	TextDisplayBuilder,
 	ThumbnailBuilder,
 } from 'discord.js';
-import { client, levelService, memberService } from '../../../di/container';
+import { levelService, memberService } from '../../../di/container';
 
 export const data = new SlashCommandBuilder()
 	.setName('level')
@@ -48,7 +47,7 @@ export async function execute(
 					new TextDisplayBuilder().setContent(
 						`**${guildMember.user.username}**`,
 					),
-					new TextDisplayBuilder().setContent(`AURA level: ${level}`),
+					new TextDisplayBuilder().setContent(`**AURA** Level: ${level}`),
 					new TextDisplayBuilder().setContent(
 						`Messages Sent: ${member.messageCount}`,
 					),
