@@ -10,52 +10,58 @@ import { ChannelService } from '../services/channelService';
 import { LevelService } from '../services/levelService';
 import { MemberService } from '../services/memberService';
 import { WelcomeLogService } from '../services/welcomeLogService';
+import { FeedService } from '../services/feedService';
+import { FeedRepository } from '../db/repositories/feedRepository';
+import { GuildService } from '../services/guildService';
 
 export const client = new Client({
-	intents: [
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.GuildMembers,
-	],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
+    ],
 });
 
 // repositories
 export const guildRepository = new GuildRepository();
 export const userRepository = new UserRepository();
+export const feedRepository = new FeedRepository();
 
 export const memberRepository = new MemberRepository(
-	userRepository,
-	guildRepository,
+    userRepository,
+    guildRepository,
 );
 
 export const channelRepository = new ChannelRepository(guildRepository);
 
 // adapters
 export const discordChannelAdapter = new DiscordChannelAdapter(
-	client,
-	guildRepository,
+    client,
+    guildRepository,
 );
 
 export const discordGuildAdapter = new DiscordGuildAdapter(
-	client,
-	userRepository,
-	guildRepository,
+    client,
+    userRepository,
+    guildRepository,
 );
 
 // services
 export const levelService = new LevelService(memberRepository);
 export const memberService = new MemberService(memberRepository);
 export const channelService = new ChannelService(channelRepository);
+export const guildService = new GuildService(guildRepository);
+export const feedService = new FeedService(feedRepository, discordChannelAdapter, channelService);
 
 export const welcomeLogService = new WelcomeLogService(
-	guildRepository,
-	channelRepository,
+    guildRepository,
+    channelRepository,
 );
 
 export async function startClient() {
-	client.login(process.env.TOKEN).catch((err) => {
-		console.error('could not login to neetcoder!', err);
-		process.exit(1);
-	});
+    client.login(process.env.TOKEN).catch((err) => {
+        console.error('could not login to neetcoder!', err);
+        process.exit(1);
+    });
 }
