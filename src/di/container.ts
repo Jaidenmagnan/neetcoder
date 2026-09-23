@@ -1,14 +1,17 @@
 import 'dotenv/config';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { DiscordChannelAdapter } from '../adapters/Discord/discordChannelAdapter';
 import { DiscordGuildAdapter } from '../adapters/Discord/discordGuildAdapter';
+import { DiscordReactionRoleAdapter } from '../adapters/Discord/discordReactionRoleAdapter';
 import { ChannelRepository } from '../db/repositories/channelRepository';
 import { GuildRepository } from '../db/repositories/guildRepository';
 import { MemberRepository } from '../db/repositories/memberRepository';
+import { ReactionRoleRepository } from '../db/repositories/reactionRoleRepository';
 import { UserRepository } from '../db/repositories/userRepository';
 import { ChannelService } from '../services/channelService';
 import { LevelService } from '../services/levelService';
 import { MemberService } from '../services/memberService';
+import { ReactionRoleService } from '../services/reactionRoleService';
 import { WelcomeLogService } from '../services/welcomeLogService';
 
 export const client = new Client({
@@ -16,7 +19,14 @@ export const client = new Client({
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildMembers,
+	],
+	partials: [
+		Partials.Channel,
+		Partials.Message,
+		Partials.Reaction,
+		Partials.User,
 	],
 });
 
@@ -30,6 +40,9 @@ export const memberRepository = new MemberRepository(
 );
 
 export const channelRepository = new ChannelRepository(guildRepository);
+export const reactionRoleRepository = new ReactionRoleRepository(
+	channelRepository,
+);
 
 // adapters
 export const discordChannelAdapter = new DiscordChannelAdapter(
@@ -42,6 +55,9 @@ export const discordGuildAdapter = new DiscordGuildAdapter(
 	userRepository,
 	guildRepository,
 );
+export const discordReactionRoleAdapter = new DiscordReactionRoleAdapter(
+	client,
+);
 
 // services
 export const levelService = new LevelService(memberRepository);
@@ -51,6 +67,11 @@ export const channelService = new ChannelService(channelRepository);
 export const welcomeLogService = new WelcomeLogService(
 	guildRepository,
 	channelRepository,
+);
+
+export const reactionRoleService = new ReactionRoleService(
+	reactionRoleRepository,
+	discordReactionRoleAdapter,
 );
 
 export async function startClient() {

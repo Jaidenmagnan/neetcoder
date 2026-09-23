@@ -4,7 +4,8 @@ module.exports = {
 	name: Events.InteractionCreate,
 	on: true,
 	async execute(interaction: Interaction): Promise<void> {
-		if (!interaction.isChatInputCommand()) return;
+		if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
+			return;
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
@@ -12,6 +13,17 @@ module.exports = {
 			console.error(
 				`No command matching ${interaction.commandName} was found.`,
 			);
+			return;
+		}
+
+		if (interaction.isAutocomplete()) {
+			if (!command.autocomplete) return;
+
+			try {
+				await command.autocomplete(interaction);
+			} catch (error) {
+				console.error('Autocomplete interaction failed.', error);
+			}
 			return;
 		}
 

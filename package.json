@@ -5,7 +5,8 @@
   "module": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --import tsx --test --test-isolation=none \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
