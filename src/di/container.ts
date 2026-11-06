@@ -3,15 +3,20 @@ import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { DiscordChannelAdapter } from '../adapters/Discord/discordChannelAdapter';
 import { DiscordGuildAdapter } from '../adapters/Discord/discordGuildAdapter';
 import { DiscordReactionRoleAdapter } from '../adapters/Discord/discordReactionRoleAdapter';
+import { DiscordRecapAdapter } from '../adapters/Discord/discordRecapAdapter';
 import { ChannelRepository } from '../db/repositories/channelRepository';
 import { GuildRepository } from '../db/repositories/guildRepository';
 import { MemberRepository } from '../db/repositories/memberRepository';
 import { ReactionRoleRepository } from '../db/repositories/reactionRoleRepository';
+import { RecapRepository } from '../db/repositories/recapRepository';
 import { UserRepository } from '../db/repositories/userRepository';
 import { ChannelService } from '../services/channelService';
 import { LevelService } from '../services/levelService';
 import { MemberService } from '../services/memberService';
+import { OpenAIRecapSummarizer } from '../services/openAIRecapSummarizer';
 import { ReactionRoleService } from '../services/reactionRoleService';
+import { RecapScheduler } from '../services/recapScheduler';
+import { RecapService } from '../services/recapService';
 import { WelcomeLogService } from '../services/welcomeLogService';
 
 export const client = new Client({
@@ -43,6 +48,7 @@ export const channelRepository = new ChannelRepository(guildRepository);
 export const reactionRoleRepository = new ReactionRoleRepository(
 	channelRepository,
 );
+export const recapRepository = new RecapRepository(channelRepository);
 
 // adapters
 export const discordChannelAdapter = new DiscordChannelAdapter(
@@ -58,6 +64,7 @@ export const discordGuildAdapter = new DiscordGuildAdapter(
 export const discordReactionRoleAdapter = new DiscordReactionRoleAdapter(
 	client,
 );
+export const discordRecapAdapter = new DiscordRecapAdapter(client);
 
 // services
 export const levelService = new LevelService(memberRepository);
@@ -73,6 +80,13 @@ export const reactionRoleService = new ReactionRoleService(
 	reactionRoleRepository,
 	discordReactionRoleAdapter,
 );
+export const recapSummarizer = new OpenAIRecapSummarizer();
+export const recapService = new RecapService(
+	recapRepository,
+	discordRecapAdapter,
+	recapSummarizer,
+);
+export const recapScheduler = new RecapScheduler(recapService);
 
 export async function startClient() {
 	client.login(process.env.TOKEN).catch((err) => {

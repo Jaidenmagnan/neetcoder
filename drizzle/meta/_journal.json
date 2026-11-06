@@ -15,6 +15,13 @@
       "when": 1790125691950,
       "tag": "0001_awesome_impossible_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793847088751,
+      "tag": "0002_cute_mindworm",
+      "breakpoints": true
     }
   ]
 }
